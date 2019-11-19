@@ -53,6 +53,7 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
             let historyLabel = UILabel(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: historyHeight))
             historyLabel.text = "Historical Information for \(coin.name) - \(coin.symbol)"
             historyLabel.textAlignment = .center
+            historyLabel.textColor = .black
             view.addSubview(historyLabel)
             
             historicalButtonDay = UIButton(frame: CGRect(x: 0, y: 50, width: 75, height: 50))
@@ -98,19 +99,23 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
             
             nameLabel.frame = CGRect(x: 0, y: (chartHeight + imageSize) + 190, width: view.frame.size.width, height: priceLabelHeight)
             nameLabel.textAlignment = .center
+            nameLabel.textColor = .black
             view.addSubview(nameLabel)
             
             priceLabel.frame = CGRect(x: 0, y: (chartHeight + imageSize) + 210, width: view.frame.size.width, height: priceLabelHeight)
             priceLabel.textAlignment = .center
+            priceLabel.textColor = .black
             view.addSubview(priceLabel)
             
             youOwnLabel.frame = CGRect(x: 0, y: (chartHeight + imageSize + priceLabelHeight * 2) + 190, width: view.frame.size.width, height: priceLabelHeight)
             youOwnLabel.textAlignment = .center
+            youOwnLabel.textColor = .black
             youOwnLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
             view.addSubview(youOwnLabel)
             
             worthLabel.frame = CGRect(x: 0, y: (chartHeight + imageSize + priceLabelHeight * 3) + 190, width: view.frame.size.width, height: priceLabelHeight)
             worthLabel.textAlignment = .center
+            worthLabel.textColor = .black
             worthLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
             view.addSubview(worthLabel)
             

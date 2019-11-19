@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		070C4A0E22B3049A009B1E11 /* SwiftChart.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 070C4A0D22B30499009B1E11 /* SwiftChart.framework */; };
-		076276CC22B2B09400A32C98 /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 076276C922B2B09400A32C98 /* Alamofire.framework */; };
+		0740333E237E0462009DA74E /* SwiftChart.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 070C4A0D22B30499009B1E11 /* SwiftChart.framework */; };
+		0740333F237E0462009DA74E /* SwiftChart.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 070C4A0D22B30499009B1E11 /* SwiftChart.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		07C56BC422B874CF00C83360 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C56BC322B874CF00C83360 /* SettingsViewController.swift */; };
 		07C56BC622B950C000C83360 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07C56BC522B950C000C83360 /* Images.xcassets */; };
 		07DD594D22B2EF2900E0D179 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07DD594C22B2EF2900E0D179 /* Reachability.swift */; };
@@ -19,6 +19,20 @@
 		B8C38FBA2097577600E01981 /* CryptoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C38FB92097577600E01981 /* CryptoTableViewController.swift */; };
 		B8C38FBC209758FA00E01981 /* CoinData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C38FBB209758FA00E01981 /* CoinData.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		07403340237E0462009DA74E /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				0740333F237E0462009DA74E /* SwiftChart.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		070C4A0D22B30499009B1E11 /* SwiftChart.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftChart.framework; path = Carthage/Build/iOS/SwiftChart.framework; sourceTree = "<group>"; };
@@ -41,8 +55,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				076276CC22B2B09400A32C98 /* Alamofire.framework in Frameworks */,
-				070C4A0E22B3049A009B1E11 /* SwiftChart.framework in Frameworks */,
+				0740333E237E0462009DA74E /* SwiftChart.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,6 +116,7 @@
 				B8C38FA1209756B900E01981 /* Frameworks */,
 				B8C38FA2209756B900E01981 /* Resources */,
 				076276C622B2A17700A32C98 /* ShellScript */,
+				07403340237E0462009DA74E /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -168,7 +182,6 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/Carthage/Build/iOS/Alamofire.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/SwiftChart.framework",
 			);
 			outputFileListPaths = (

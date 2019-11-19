@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import Alamofire
+//import Alamofire
 
 var historicalData = [Double]()
 
@@ -67,7 +67,7 @@ class CoinData {
                 coins.append(coin)
             }
         }
-         
+        
     }
     
     func html() -> String {
@@ -102,10 +102,19 @@ class CoinData {
             }
         }
         
-        Alamofire.request("https://min-api.cryptocompare.com/data/pricemulti?fsyms=\(listOfSymbols)&tsyms=USD").responseJSON { (response) in
-            if let json = response.result.value as? [String:Any] {
+        
+        if let url = URL(string: "https://min-api.cryptocompare.com/data/pricemulti?fsyms=\(listOfSymbols)&tsyms=USD") {
+            
+            let data = try? Data(contentsOf: url)
+            
+            let json = try? JSONSerialization.jsonObject(with: data!, options: [])
+            
+            if let object = json as? [String: Any] {
+                
+            //Alamofire.request("https://min-api.cryptocompare.com/data/pricemulti?fsyms=\(listOfSymbols)&tsyms=USD").responseJSON { (response) in
+                //if let json = response.result.value as? [String:Any] {
                 for coin in coins {
-                    if let coinJSON = json[coin.symbol] as? [String:Double] {
+                    if let coinJSON = object[coin.symbol] as? [String:Double] {
                         if let price = coinJSON["USD"] {
                             coin.price = price
                             UserDefaults.standard.set(price, forKey: coin.symbol)
@@ -159,9 +168,9 @@ class CoinData {
                     
                     if let url = URL(string: "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=\(symbol)&tsyms=USD") {
                         
-                        let data = try Data(contentsOf: url)
+                        let data = try? Data(contentsOf: url)
                         
-                        let json = try JSONSerialization.jsonObject(with: data, options: [])
+                        let json = try? JSONSerialization.jsonObject(with: data!, options: [])
                         
                         if let object = json as? [String: Any] {
                             
@@ -178,7 +187,7 @@ class CoinData {
                                             let newValue = yesterdayDic.updateValue(name, forKey: symbol)
                                             
                                             UserDefaults.standard.set(newValue, forKey: "yesterdayDic")
-                                           
+                                            
                                         }
                                         
                                     }
@@ -186,7 +195,7 @@ class CoinData {
                                 }
                                 
                             }
-                        
+                            
                         } else {
                             print("JSON is invalid")
                         }
@@ -274,15 +283,22 @@ class Coin {
             self.name = names
         }
         /*if let yesterdays = UserDefaults.standard.string(forKey: symbol + "yesterday") {
-            self.yesterdayClose = yesterdays
-        }*/
+         self.yesterdayClose = yesterdays
+         }*/
         
     }
     
     func getHistoricalDataMonth() {
-    Alamofire.request("https://min-api.cryptocompare.com/data/histoday?fsym=\(symbol)&tsym=USD&limit=30").responseJSON { (response) in
-            if let json = response.result.value as? [String:Any] {
-                if let pricesJSON = json["Data"] as? [[String:Double]] {
+        
+        if let url = URL(string: "https://min-api.cryptocompare.com/data/histoday?fsym=\(symbol)&tsym=USD&limit=30") {
+            
+            let data = try? Data(contentsOf: url)
+            
+            let json = try? JSONSerialization.jsonObject(with: data!, options: [])
+            
+            if let object = json as? [String: Any] {
+             
+                if let pricesJSON = object["Data"] as? [[String:Double]] {
                     self.historicalData = []
                     for priceJSON in pricesJSON {
                         if let closePrice = priceJSON["close"] {
@@ -298,19 +314,26 @@ class Coin {
     }
     
     func getHistoricalDataDay() {
-    Alamofire.request("https://min-api.cryptocompare.com/data/histohour?fsym=\(symbol)&tsym=USD&limit=24").responseJSON { (response) in
-            if let json = response.result.value as? [String:Any] {
-                if let pricesJSON = json["Data"] as? [[String:Double]] {
+        
+        if let url = URL(string: "https://min-api.cryptocompare.com/data/histohour?fsym=\(symbol)&tsym=USD&limit=24") {
+            
+            let data = try? Data(contentsOf: url)
+            
+            let json = try? JSONSerialization.jsonObject(with: data!, options: [])
+            
+            if let object = json as? [String: Any] {
+              
+                if let pricesJSON = object["Data"] as? [[String:Double]] {
                     self.historicalData = []
                     for priceJSON in pricesJSON {
                         if let closePrice = priceJSON["close"] {
                             self.historicalData.append(closePrice)
                         }
-
+                        
                     }
                     CoinData.shared.delegate?.newHistory?()
                     UserDefaults.standard.set(self.historicalData, forKey: self.symbol + "history")
-                   
+                    
                 }
             }
         }
@@ -319,9 +342,16 @@ class Coin {
     
     
     func getHistoricalDataYear() {
-    Alamofire.request("https://min-api.cryptocompare.com/data/histoday?fsym=\(symbol)&tsym=USD&limit=365").responseJSON { (response) in
-            if let json = response.result.value as? [String:Any] {
-                if let pricesJSON = json["Data"] as? [[String:Double]] {
+        
+        if let url = URL(string: "https://min-api.cryptocompare.com/data/histoday?fsym=\(symbol)&tsym=USD&limit=365") {
+            
+            let data = try? Data(contentsOf: url)
+            
+            let json = try? JSONSerialization.jsonObject(with: data!, options: [])
+            
+            if let object = json as? [String: Any] {
+              
+                if let pricesJSON = object["Data"] as? [[String:Double]] {
                     self.historicalData = []
                     for priceJSON in pricesJSON {
                         if let closePrice = priceJSON["close"] {
@@ -337,9 +367,16 @@ class Coin {
     
     
     func getHistoricalDataThreeYear() {
-    Alamofire.request("https://min-api.cryptocompare.com/data/histoday?fsym=\(symbol)&tsym=USD&limit=1095").responseJSON { (response) in
-            if let json = response.result.value as? [String:Any] {
-                if let pricesJSON = json["Data"] as? [[String:Double]] {
+        
+        if let url = URL(string: "https://min-api.cryptocompare.com/data/histoday?fsym=\(symbol)&tsym=USD&limit=1095") {
+            
+            let data = try? Data(contentsOf: url)
+            
+            let json = try? JSONSerialization.jsonObject(with: data!, options: [])
+            
+            if let object = json as? [String: Any] {
+               
+                if let pricesJSON = object["Data"] as? [[String:Double]] {
                     self.historicalData = []
                     for priceJSON in pricesJSON {
                         if let closePrice = priceJSON["close"] {
@@ -354,9 +391,16 @@ class Coin {
     }
     
     func getHistoricalDataFiveYear() {
-    Alamofire.request("https://min-api.cryptocompare.com/data/histoday?fsym=\(symbol)&tsym=USD&limit=1825").responseJSON { (response) in
-            if let json = response.result.value as? [String:Any] {
-                if let pricesJSON = json["Data"] as? [[String:Double]] {
+        
+        if let url = URL(string: "https://min-api.cryptocompare.com/data/histoday?fsym=\(symbol)&tsym=USD&limit=1825") {
+            
+            let data = try? Data(contentsOf: url)
+            
+            let json = try? JSONSerialization.jsonObject(with: data!, options: [])
+            
+            if let object = json as? [String: Any] {
+           
+                if let pricesJSON = object["Data"] as? [[String:Double]] {
                     self.historicalData = []
                     for priceJSON in pricesJSON {
                         if let closePrice = priceJSON["close"] {
@@ -383,6 +427,6 @@ class Coin {
     }
     
     
-  }
+}
 
 

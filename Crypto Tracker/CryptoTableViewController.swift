@@ -8,7 +8,7 @@
 
 import UIKit
 import LocalAuthentication
-import Alamofire
+//import Alamofire
 
 private let headerHeight : CGFloat = 100.0
 private let netWorthHeight : CGFloat = 45.0
@@ -416,12 +416,14 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         let networthLabel = UILabel(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: netWorthHeight))
         networthLabel.text = "Crypto Net Worth"
         networthLabel.textAlignment = .center
+        networthLabel.textColor = .black
         
         headerView.addSubview(networthLabel)
         
         amountLabel.frame = CGRect(x: 0, y: netWorthHeight, width: view.frame.size.width, height: headerHeight - netWorthHeight)
         amountLabel.textAlignment = .center
         amountLabel.font = UIFont.boldSystemFont(ofSize: 60.0)
+        amountLabel.textColor = .black
         headerView.addSubview(amountLabel)
         
         displayNetWorth()
@@ -500,7 +502,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             
         if name == coin.yesterdayClose {
             
-            cell.textLabel?.textColor = UIColor.black
+            cell.textLabel?.textColor = UIColor.blue
             
             
             if coin.amount != 0.0 {

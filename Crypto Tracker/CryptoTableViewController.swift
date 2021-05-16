@@ -35,7 +35,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        createSpinnerView()
+        //createSpinnerView()
         
         getSavedCryptoSymbols()
         
@@ -58,7 +58,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         navigationItem.setLeftBarButton(UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(stopMoveRows)), animated: true)
         
-        timer.invalidate()
+        //timer.invalidate()
     }
     
     @objc func stopMoveRows() {
@@ -67,7 +67,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(moveRows))
         
-        timer = Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
+        //timer = Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
         
         
     }
@@ -104,7 +104,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             
             print("TableView Internet connection OK")
             
-            timer = Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
+            timer = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
             
             print("Prices updated.")
             
@@ -128,7 +128,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             
             print("Internet connection FAILED")
             
-            let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Thia app requires an internet connection.", preferredStyle: UIAlertController.Style.alert)
+            let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "This app requires an internet connection.", preferredStyle: UIAlertController.Style.alert)
             
             alert.addAction(UIAlertAction(title: "Try Again?", style: .default, handler: { action in
                 
@@ -155,7 +155,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         child.didMove(toParent: self)
         
         // wait five seconds to simulate some work happening
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             // then remove the spinner view controller
             child.willMove(toParent: nil)
             child.view.removeFromSuperview()
@@ -315,7 +315,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
                                    
                                     if let name1 = usd["CHANGEPCT24HOUR"] as? Double {
                                         
-                                        let name = String(format: "%.2f", name1)
+                                        let name = String(format: "%.7f", name1)
                                         
                                         //percentData.append(name)
                                         
@@ -395,11 +395,13 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     @objc func settingsTapped() {
         
         let settings = SettingsViewController()
+        settings.isModalInPresentation = true
         navigationController?.pushViewController(settings, animated: true)
         
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        
         CoinData.shared.delegate = self
         tableView.reloadData()
         displayNetWorth()
@@ -422,7 +424,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         amountLabel.frame = CGRect(x: 0, y: netWorthHeight, width: view.frame.size.width, height: headerHeight - netWorthHeight)
         amountLabel.textAlignment = .center
-        amountLabel.font = UIFont.boldSystemFont(ofSize: 60.0)
+        amountLabel.font = UIFont.boldSystemFont(ofSize: 40.0)
         amountLabel.textColor = .black
         headerView.addSubview(amountLabel)
         
@@ -432,7 +434,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     }
     
     func displayNetWorth() {
-        amountLabel.text = CoinData.shared.netWorthAsString()
+        amountLabel.text = "$" + CoinData.shared.netWorthAsString()
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -449,35 +451,42 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-        return 88
+        return 268
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
         
-        cell.textLabel!.numberOfLines = 4
+        cell.textLabel!.numberOfLines = 9
         
         cell.textLabel!.lineBreakMode = .byWordWrapping
         
         let coin = coins[indexPath.row]  //CoinData.shared.coins[indexPath.row]
         
-        let name = String(format: "%.2f", coin.price)
+        let name = String(format: "%.4f", coin.price)
+        
+        coin.gainLoss = (coin.price * coin.amount) - (coin.costBasis * coin.amount)
+        
+        coin.percentGainLoss = (coin.gainLoss / coin.investmentAmt) * 100
+        
+        let doubleStr = String(format: "%.2f", coin.percentGainLoss)
+        
         
         if name > coin.yesterdayClose {
             
             //print("Now: $\(name) Close: $\(coin.yesterdayClose)")
             
-            //cell.backgroundColor = UIColor.green
-            
             cell.textLabel?.textColor = UIColor(red: 0/255, green: 170/255, blue: 14/255, alpha: 1.0)
+            
+            //cell.textLabel?.textColor = UIColor.green
             
             if coin.amount != 0.0 {
                 
-                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r\(coin.priceAsString())  \(coin.percentChange)%\rShares: \(coin.amount)"
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%\rShares: \(coin.amount)\rCost: $\(coin.costBasis)\rGain/Loss: $\(coin.gainLossAsString())\r% Gain/Loss: \(doubleStr)%"
                 
             } else {
                 
-                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r\(coin.priceAsString())  \(coin.percentChange)%"
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%"
                 
             }
             
@@ -487,14 +496,14 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             
             cell.textLabel?.textColor = UIColor.red
             
-            
             if coin.amount != 0.0 {
                 
-                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r\(coin.priceAsString())  \(coin.percentChange)%\rShares: \(coin.amount)"
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%\rShares: \(coin.amount)\rCost: $\(coin.costBasis)\rGain/Loss: $\(coin.gainLossAsString())\r% Gain/Loss: \(doubleStr)%"
+                
                 
             } else {
                 
-                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r\(coin.priceAsString())  \(coin.percentChange)%"
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%"
                 
             }
             
@@ -507,11 +516,12 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             
             if coin.amount != 0.0 {
                 
-                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r\(coin.priceAsString())  \(coin.percentChange)%\rShares: \(coin.amount)"
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%\rShares: \(coin.amount)\rCost: $\(coin.costBasis)\rGain/Loss: $\(coin.gainLossAsString())\r% Gain/Loss: \(doubleStr)%"
+                
                 
             } else {
                 
-                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r\(coin.priceAsString())  \(coin.percentChange)%"
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%"
                 
             }
             
@@ -573,7 +583,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
 }
 
 class SpinnerViewController: UIViewController {
-    var spinner = UIActivityIndicatorView(style: .whiteLarge)
+    var spinner = UIActivityIndicatorView(style: .large)
     
     override func loadView() {
         view = UIView()

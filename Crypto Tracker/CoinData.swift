@@ -9,7 +9,7 @@
 import UIKit
 //import Alamofire
 
-var historicalData = [Double]()
+//var historicalData = [Double]()
 
 var coins = [Coin]()
 
@@ -27,7 +27,7 @@ class CoinData {
             
             if symbols2!.isEmpty  {
                 
-                let symbols1 = ["BTC","XRP","XMR","ETH","LTC","BCH","EOS","BNB","BSV","ADA","XLM","ZEC","DASH","NEO"]
+                let symbols1 = ["BTC","XRP","XMR","ETH","DOGE","HOGE","LTC","BCH","EOS","BNB","BSV","ADA","XLM","ZEC","DASH","NEO"]
                 
                 UserDefaults.standard.set(symbols1, forKey: "symbols")
                 
@@ -54,7 +54,7 @@ class CoinData {
             
         } else {
             
-            let symbols1 = ["BTC","XRP","XMR","ETH","LTC","BCH","EOS","BNB","BSV","ADA","XLM","ZEC","DASH","NEO"]
+            let symbols1 = ["BTC","XRP","XMR","ETH","DOGE","HOGE","LTC","BCH","EOS","BNB","BSV","ADA","XLM","ZEC","DASH","NEO"]
             
             UserDefaults.standard.set(symbols1, forKey: "symbols")
             
@@ -90,7 +90,7 @@ class CoinData {
             netWorth += coin.amount * coin.price
         }
         
-        return doubleToMoneyString(double: netWorth)
+        return doubleToDollarString(double: netWorth)
     }
     
     func getPrices() {
@@ -182,7 +182,7 @@ class CoinData {
                                         
                                         if let close = usd["OPENDAY"] as? Double {
                                             
-                                            let name = String(format: "%.2f", close)
+                                            let name = String(format: "%.7f", close)
                                             
                                             let newValue = yesterdayDic.updateValue(name, forKey: symbol)
                                             
@@ -202,7 +202,7 @@ class CoinData {
                     } else {
                         print("Invalid URL")
                     }
-                } catch {
+                } catch let error {
                     print(error.localizedDescription)
                 }
                 
@@ -239,7 +239,20 @@ class CoinData {
     func doubleToMoneyString(double: Double) -> String {
         let formatter = NumberFormatter()
         formatter.locale = Locale(identifier: "en_US")
-        formatter.numberStyle = .currency
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 7
+        if let fancyPrice = formatter.string(from: NSNumber(floatLiteral: double)) {
+            return fancyPrice
+        } else {
+            return "ERROR"
+        }
+    }
+    
+    func doubleToDollarString(double: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 2
         if let fancyPrice = formatter.string(from: NSNumber(floatLiteral: double)) {
             return fancyPrice
         } else {
@@ -267,15 +280,21 @@ class Coin {
     var name = String()
     var percentChange = String()
     var yesterdayClose = String()
+    var costBasis = 0.0
+    var gainLoss = 0.0
+    var percentGainLoss = 0.0
+    var investmentAmt = 0.0
     
     init(symbol: String) {
         self.symbol = symbol
         if let image = UIImage(named: symbol) {
-            self.image = image
+            self.image = resizeImage(image: image, newWidth: 100)
         }
         self.price = UserDefaults.standard.double(forKey: symbol)
         //self.percentChange = UserDefaults.standard.string(forKey: symbol + "percent")!
         self.amount = UserDefaults.standard.double(forKey: symbol + "amount")
+        self.costBasis = UserDefaults.standard.double(forKey: symbol + "costBasis")
+        self.investmentAmt = UserDefaults.standard.double(forKey: symbol + "investmentAmt")
         if let history = UserDefaults.standard.array(forKey: symbol + "history") as? [Double] {
             self.historicalData = history
         }
@@ -288,32 +307,11 @@ class Coin {
         
     }
     
-    func getHistoricalDataMonth() {
-        
-        if let url = URL(string: "https://min-api.cryptocompare.com/data/histoday?fsym=\(symbol)&tsym=USD&limit=30") {
-            
-            let data = try? Data(contentsOf: url)
-            
-            let json = try? JSONSerialization.jsonObject(with: data!, options: [])
-            
-            if let object = json as? [String: Any] {
-             
-                if let pricesJSON = object["Data"] as? [[String:Double]] {
-                    self.historicalData = []
-                    for priceJSON in pricesJSON {
-                        if let closePrice = priceJSON["close"] {
-                            self.historicalData.append(closePrice)
-                        }
-                    }
-                    CoinData.shared.delegate?.newHistory?()
-                    UserDefaults.standard.set(self.historicalData, forKey: self.symbol + "history")
-                }
-            }
-        }
-        
-    }
-    
     func getHistoricalDataDay() {
+        
+        print("symbol: \(symbol)")
+        
+        UserDefaults.standard.removeObject(forKey: symbol + "history")
         
         if let url = URL(string: "https://min-api.cryptocompare.com/data/histohour?fsym=\(symbol)&tsym=USD&limit=24") {
             
@@ -322,12 +320,14 @@ class Coin {
             let json = try? JSONSerialization.jsonObject(with: data!, options: [])
             
             if let object = json as? [String: Any] {
-              
-                if let pricesJSON = object["Data"] as? [[String:Double]] {
+                print("object: \(object)")
+                if let pricesJSON = object["Data"] as? [[String:Any]] {
                     self.historicalData = []
-                    for priceJSON in pricesJSON {
-                        if let closePrice = priceJSON["close"] {
+                    print("pricesJSON: \(pricesJSON)")
+                    for priceClose in pricesJSON {
+                        if let closePrice = priceClose["close"] as? Double {
                             self.historicalData.append(closePrice)
+                            print("closePrice: \(closePrice)")
                         }
                         
                     }
@@ -341,7 +341,36 @@ class Coin {
     }
     
     
+    func getHistoricalDataMonth() {
+        
+        UserDefaults.standard.removeObject(forKey: self.symbol + "history")
+        
+        if let url = URL(string: "https://min-api.cryptocompare.com/data/histoday?fsym=\(symbol)&tsym=USD&limit=30") {
+            
+            let data = try? Data(contentsOf: url)
+            
+            let json = try? JSONSerialization.jsonObject(with: data!, options: [])
+            
+            if let object = json as? [String: Any] {
+             
+                if let pricesJSON = object["Data"] as? [[String:Any]] {
+                    self.historicalData = []
+                    for priceJSON in pricesJSON {
+                        if let closePrice = priceJSON["close"] as? Double {
+                            self.historicalData.append(closePrice)
+                        }
+                    }
+                    CoinData.shared.delegate?.newHistory?()
+                    UserDefaults.standard.set(self.historicalData, forKey: self.symbol + "history")
+                }
+            }
+        }
+        
+    }
+    
     func getHistoricalDataYear() {
+        
+        UserDefaults.standard.removeObject(forKey: self.symbol + "history")
         
         if let url = URL(string: "https://min-api.cryptocompare.com/data/histoday?fsym=\(symbol)&tsym=USD&limit=365") {
             
@@ -351,10 +380,10 @@ class Coin {
             
             if let object = json as? [String: Any] {
               
-                if let pricesJSON = object["Data"] as? [[String:Double]] {
+                if let pricesJSON = object["Data"] as? [[String:Any]] {
                     self.historicalData = []
                     for priceJSON in pricesJSON {
-                        if let closePrice = priceJSON["close"] {
+                        if let closePrice = priceJSON["close"] as? Double {
                             self.historicalData.append(closePrice)
                         }
                     }
@@ -368,6 +397,8 @@ class Coin {
     
     func getHistoricalDataThreeYear() {
         
+        UserDefaults.standard.removeObject(forKey: self.symbol + "history")
+        
         if let url = URL(string: "https://min-api.cryptocompare.com/data/histoday?fsym=\(symbol)&tsym=USD&limit=1095") {
             
             let data = try? Data(contentsOf: url)
@@ -376,10 +407,10 @@ class Coin {
             
             if let object = json as? [String: Any] {
                
-                if let pricesJSON = object["Data"] as? [[String:Double]] {
+                if let pricesJSON = object["Data"] as? [[String:Any]] {
                     self.historicalData = []
                     for priceJSON in pricesJSON {
-                        if let closePrice = priceJSON["close"] {
+                        if let closePrice = priceJSON["close"] as? Double {
                             self.historicalData.append(closePrice)
                         }
                     }
@@ -392,6 +423,8 @@ class Coin {
     
     func getHistoricalDataFiveYear() {
         
+        UserDefaults.standard.removeObject(forKey: self.symbol + "history")
+        
         if let url = URL(string: "https://min-api.cryptocompare.com/data/histoday?fsym=\(symbol)&tsym=USD&limit=1825") {
             
             let data = try? Data(contentsOf: url)
@@ -400,10 +433,10 @@ class Coin {
             
             if let object = json as? [String: Any] {
            
-                if let pricesJSON = object["Data"] as? [[String:Double]] {
+                if let pricesJSON = object["Data"] as? [[String:Any]] {
                     self.historicalData = []
                     for priceJSON in pricesJSON {
-                        if let closePrice = priceJSON["close"] {
+                        if let closePrice = priceJSON["close"] as? Double {
                             self.historicalData.append(closePrice)
                         }
                     }
@@ -424,6 +457,25 @@ class Coin {
     
     func amountAsString() -> String {
         return CoinData.shared.doubleToMoneyString(double: amount * price)
+    }
+    
+    func costAsString() -> String {
+        return CoinData.shared.doubleToMoneyString(double: costBasis)
+    }
+    
+    func gainLossAsString() -> String {
+        
+        return CoinData.shared.doubleToDollarString(double: gainLoss)
+    }
+    
+    func resizeImage(image: UIImage, newWidth: CGFloat) -> UIImage {           let scale = newWidth / image.size.width
+        let newHeight = image.size.height * scale
+        UIGraphicsBeginImageContext(CGSize(width: newWidth, height: newHeight))
+        image.draw(in: CGRect(x: 0, y: 0, width: newWidth, height: newHeight))
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return newImage!
+        
     }
     
     

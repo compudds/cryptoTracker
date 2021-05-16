@@ -3,15 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0740333E237E0462009DA74E /* SwiftChart.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 070C4A0D22B30499009B1E11 /* SwiftChart.framework */; };
-		0740333F237E0462009DA74E /* SwiftChart.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 070C4A0D22B30499009B1E11 /* SwiftChart.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		07C56BC422B874CF00C83360 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C56BC322B874CF00C83360 /* SettingsViewController.swift */; };
 		07C56BC622B950C000C83360 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07C56BC522B950C000C83360 /* Images.xcassets */; };
 		07DD594D22B2EF2900E0D179 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07DD594C22B2EF2900E0D179 /* Reachability.swift */; };
+		3E5695769854E3C07D428B8F /* Pods_Crypto_Tracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CE944F7B051469B28609F4A /* Pods_Crypto_Tracker.framework */; };
 		B8559B60209C393000C9ABEA /* CoinViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8559B5F209C393000C9ABEA /* CoinViewController.swift */; };
 		B8559B62209DCBE900C9ABEA /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8559B61209DCBE900C9ABEA /* AuthViewController.swift */; };
 		B8C38FA8209756B900E01981 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C38FA7209756B900E01981 /* AppDelegate.swift */; };
@@ -20,26 +19,14 @@
 		B8C38FBC209758FA00E01981 /* CoinData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C38FBB209758FA00E01981 /* CoinData.swift */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		07403340237E0462009DA74E /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				0740333F237E0462009DA74E /* SwiftChart.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
-		070C4A0D22B30499009B1E11 /* SwiftChart.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftChart.framework; path = Carthage/Build/iOS/SwiftChart.framework; sourceTree = "<group>"; };
 		076276C922B2B09400A32C98 /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Carthage/Build/iOS/Alamofire.framework; sourceTree = "<group>"; };
 		07C56BC322B874CF00C83360 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		07C56BC522B950C000C83360 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		07DD594C22B2EF2900E0D179 /* Reachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
+		39DD6D10429D8DA133B4BF06 /* Pods-Crypto Tracker.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Crypto Tracker.debug.xcconfig"; path = "Target Support Files/Pods-Crypto Tracker/Pods-Crypto Tracker.debug.xcconfig"; sourceTree = "<group>"; };
+		3CE944F7B051469B28609F4A /* Pods_Crypto_Tracker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Crypto_Tracker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		636AFCCEC6F6F968CB05464C /* Pods-Crypto Tracker.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Crypto Tracker.release.xcconfig"; path = "Target Support Files/Pods-Crypto Tracker/Pods-Crypto Tracker.release.xcconfig"; sourceTree = "<group>"; };
 		B8559B5F209C393000C9ABEA /* CoinViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinViewController.swift; sourceTree = "<group>"; };
 		B8559B61209DCBE900C9ABEA /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
 		B8C38FA4209756B900E01981 /* Crypto Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Crypto Tracker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -55,7 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0740333E237E0462009DA74E /* SwiftChart.framework in Frameworks */,
+				3E5695769854E3C07D428B8F /* Pods_Crypto_Tracker.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,8 +52,8 @@
 		68E81FC0A14A8738E839F07D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				070C4A0D22B30499009B1E11 /* SwiftChart.framework */,
 				076276C922B2B09400A32C98 /* Alamofire.framework */,
+				3CE944F7B051469B28609F4A /* Pods_Crypto_Tracker.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -77,6 +64,7 @@
 				B8C38FA6209756B900E01981 /* Crypto Tracker */,
 				B8C38FA5209756B900E01981 /* Products */,
 				68E81FC0A14A8738E839F07D /* Frameworks */,
+				BADF08194279F415ECE46100 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -105,6 +93,15 @@
 			path = "Crypto Tracker";
 			sourceTree = "<group>";
 		};
+		BADF08194279F415ECE46100 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				39DD6D10429D8DA133B4BF06 /* Pods-Crypto Tracker.debug.xcconfig */,
+				636AFCCEC6F6F968CB05464C /* Pods-Crypto Tracker.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -112,11 +109,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B8C38FB6209756BA00E01981 /* Build configuration list for PBXNativeTarget "Crypto Tracker" */;
 			buildPhases = (
+				D3D5FC7BB45C5CAEAFFD68E7 /* [CP] Check Pods Manifest.lock */,
 				B8C38FA0209756B900E01981 /* Sources */,
 				B8C38FA1209756B900E01981 /* Frameworks */,
 				B8C38FA2209756B900E01981 /* Resources */,
-				076276C622B2A17700A32C98 /* ShellScript */,
-				07403340237E0462009DA74E /* Embed Frameworks */,
+				5929649FDD096A0ECABDBD2A /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -134,7 +131,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0930;
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 1220;
 				ORGANIZATIONNAME = "Better Search, LLC";
 				TargetAttributes = {
 					B8C38FA3209756B900E01981 = {
@@ -174,7 +171,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		076276C622B2A17700A32C98 /* ShellScript */ = {
+		5929649FDD096A0ECABDBD2A /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Crypto Tracker/Pods-Crypto Tracker-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Crypto Tracker/Pods-Crypto Tracker-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Crypto Tracker/Pods-Crypto Tracker-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D3D5FC7BB45C5CAEAFFD68E7 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -182,15 +196,18 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/Carthage/Build/iOS/SwiftChart.framework",
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
+			name = "[CP] Check Pods Manifest.lock";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Crypto Tracker-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/usr/local/bin/carthage copy-frameworks\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -250,6 +267,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -275,7 +293,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -310,6 +328,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -329,7 +348,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -340,6 +359,7 @@
 		};
 		B8C38FB7209756BA00E01981 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 39DD6D10429D8DA133B4BF06 /* Pods-Crypto Tracker.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -350,7 +370,7 @@
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = "Crypto Tracker/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -364,6 +384,7 @@
 		};
 		B8C38FB8209756BA00E01981 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 636AFCCEC6F6F968CB05464C /* Pods-Crypto Tracker.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -374,7 +395,7 @@
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = "Crypto Tracker/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

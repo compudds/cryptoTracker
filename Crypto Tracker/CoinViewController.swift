@@ -33,6 +33,7 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
     var youOwnLabel = UILabel()
     var worthLabel = UILabel()
     var nameLabel = UILabel()
+    var costBasisLabel = UILabel()
     var nameFull = String()
     
     override func viewDidLoad() {
@@ -122,6 +123,7 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
             newPrices()
             
         }
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -176,6 +178,10 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
         xLabel.textAlignment = .center
         view.addSubview(xLabel)
         
+        print("historicalData: \(coin!.historicalData)")
+        
+        newHistory()
+        
     }
     
     @objc func displayHistoricalInfoMonth() {
@@ -197,6 +203,10 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
         xLabel.text = "Days"
         xLabel.textAlignment = .center
         view.addSubview(xLabel)
+        
+        print("historicalData: \(coin!.historicalData)")
+        
+        newHistory()
         
     }
     
@@ -220,6 +230,10 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
         xLabel.textAlignment = .center
         view.addSubview(xLabel)
         
+        print("historicalData: \(coin!.historicalData)")
+        
+        newHistory()
+        
     }
     
     @objc func displayHistoricalInfo3Y() {
@@ -241,6 +255,10 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
         xLabel.text = "Days"
         xLabel.textAlignment = .center
         view.addSubview(xLabel)
+        
+        print("historicalData: \(coin!.historicalData)")
+        
+        newHistory()
         
     }
     
@@ -264,6 +282,10 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
         xLabel.textAlignment = .center
         view.addSubview(xLabel)
         
+        print("historicalData: \(coin!.historicalData)")
+        
+        newHistory()
+        
     }
     
     func removeSubview() {
@@ -281,12 +303,28 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
     
     @objc func editTapped() {
         if let coin = coin {
-            let alert = UIAlertController(title: "How much \(coin.symbol) do you own?", message: nil, preferredStyle: .alert)
+            let alert = UIAlertController(title: "How much \(coin.symbol) do you own & cost basis?", message: nil, preferredStyle: .alert)
             alert.addTextField { (textField) in
-                textField.placeholder = "0.5"
+                textField.placeholder = "Amount Owned"
                 textField.keyboardType = .decimalPad
                 if self.coin?.amount != 0.0 {
                     textField.text = String(coin.amount)
+                }
+            }
+        
+            alert.addTextField { (textField2) in
+                textField2.placeholder = "Cost Basis"
+                textField2.keyboardType = .decimalPad
+                if self.coin?.costBasis != 0.0 {
+                    textField2.text = String(coin.costBasis)
+                }
+            }
+            
+            alert.addTextField { (textField3) in
+                textField3.placeholder = "Original Investment Amt."
+                textField3.keyboardType = .decimalPad
+                if self.coin?.investmentAmt != 0.0 {
+                    textField3.text = String(coin.investmentAmt)
                 }
             }
             
@@ -298,6 +336,26 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
                         self.newPrices()
                     }
                 }
+                
+                if let text = alert.textFields?[1].text {
+                    if let costBasis = Double(text) {
+                        self.coin?.costBasis = costBasis
+                        UserDefaults.standard.set(costBasis, forKey: coin.symbol + "costBasis")
+                        self.newPrices()
+                    }
+                    
+                }
+                
+                if let text = alert.textFields?[2].text {
+                    if let invAmt = Double(text) {
+                        self.coin?.investmentAmt = invAmt
+                        UserDefaults.standard.set(invAmt, forKey: coin.symbol + "investmentAmt")
+                        self.newPrices()
+                    }
+                    
+                }
+                
+                
             }))
             self.present(alert, animated: true, completion: nil)
         }
@@ -314,9 +372,10 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
     func newPrices() {
         if let coin = coin {
             self.nameLabel.text = "\(coin.name) - \(coin.symbol)"
-            priceLabel.text = coin.priceAsString()
-            worthLabel.text = coin.amountAsString()
+            priceLabel.text = "Price $" + coin.priceAsString() + " Cost $\(coin.costBasis)"
+            worthLabel.text = "$" + coin.amountAsString()
             youOwnLabel.text = "You own: \(coin.amount) \(coin.symbol)"
+            costBasisLabel.text = "Cost Basis: \(coin.costBasis)"
         }
     }
     

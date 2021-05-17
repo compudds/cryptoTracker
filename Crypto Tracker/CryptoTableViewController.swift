@@ -315,7 +315,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
                                    
                                     if let name1 = usd["CHANGEPCT24HOUR"] as? Double {
                                         
-                                        let name = String(format: "%.7f", name1)
+                                        let name = String(format: "%.2f", name1)
                                         
                                         //percentData.append(name)
                                         
@@ -471,6 +471,10 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         let doubleStr = String(format: "%.2f", coin.percentGainLoss)
         
+        let value = coin.price * coin.amount
+        
+        let valueToDollar = String(format: "%.2f", value)
+        
         
         if name > coin.yesterdayClose {
             
@@ -482,7 +486,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             
             if coin.amount != 0.0 {
                 
-                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%\rShares: \(coin.amount)\rCost: $\(coin.costBasis)\rGain/Loss: $\(coin.gainLossAsString())\r% Gain/Loss: \(doubleStr)%"
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%\rShares: \(coin.amount)\rValue: $\(valueToDollar)\rCost: $\(coin.costBasis)\rGain/Loss: $\(coin.gainLossAsString())\r% Gain/Loss: \(doubleStr)%"
                 
             } else {
                 
@@ -498,7 +502,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             
             if coin.amount != 0.0 {
                 
-                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%\rShares: \(coin.amount)\rCost: $\(coin.costBasis)\rGain/Loss: $\(coin.gainLossAsString())\r% Gain/Loss: \(doubleStr)%"
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%\rShares: \(coin.amount)\rValue: $\(valueToDollar)\rCost: $\(coin.costBasis)\rGain/Loss: $\(coin.gainLossAsString())\r% Gain/Loss: \(doubleStr)%"
                 
                 
             } else {
@@ -516,7 +520,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             
             if coin.amount != 0.0 {
                 
-                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%\rShares: \(coin.amount)\rCost: $\(coin.costBasis)\rGain/Loss: $\(coin.gainLossAsString())\r% Gain/Loss: \(doubleStr)%"
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%\rShares: \(coin.amount)\rValue: $\(valueToDollar)\rCost: $\(coin.costBasis)\rGain/Loss: $\(coin.gainLossAsString())\r% Gain/Loss: \(doubleStr)%"
                 
                 
             } else {

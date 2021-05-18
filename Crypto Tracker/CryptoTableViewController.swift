@@ -32,6 +32,8 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     var count1 = 0
     
+    var activityIndicator: UIActivityIndicatorView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -47,9 +49,15 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         navigationItem.leftBarButtonItems = [editButton, reportButton]
         
-        if LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) {
+        let settingsButton = UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(settingsTapped))
+        
+        let refreshButton = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(updatePrices))
+        
+        navigationItem.rightBarButtonItems = [settingsButton,refreshButton]
+        
+        /*if LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) {
             updateSecureButton()
-        }
+        }*/
     }
     
     @objc func moveRows() {
@@ -58,7 +66,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         navigationItem.setLeftBarButton(UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(stopMoveRows)), animated: true)
         
-        //timer.invalidate()
+        timer.invalidate()
     }
     
     @objc func stopMoveRows() {
@@ -67,7 +75,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(moveRows))
         
-        //timer = Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: 75, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
         
         
     }
@@ -95,6 +103,8 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     override func viewDidAppear(_ animated: Bool) {
         
+        updatePrices()
+        
         noInternetConnection()
     }
     
@@ -104,13 +114,13 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             
             print("TableView Internet connection OK")
             
-            timer = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
+            timer = Timer.scheduledTimer(timeInterval: 75, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
             
             print("Prices updated.")
             
             print("cryptoSymbols: \(cryptoSymbols)")
             
-            CoinData.shared.getPrices()
+            /*CoinData.shared.getPrices()
             
             CoinData.shared.getYesterdaysClose()
             
@@ -122,7 +132,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             
             percentChange24Hr()
             
-            CoinData.shared.getPercents()
+            CoinData.shared.getPercents()*/
             
         } else {
             
@@ -145,6 +155,13 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
     }
     
+    func endTimer() {
+        
+        print("Timer Stoped!!!")
+        
+        timer.invalidate()
+    }
+    
     func createSpinnerView() {
         let child = SpinnerViewController()
         
@@ -155,7 +172,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         child.didMove(toParent: self)
         
         // wait five seconds to simulate some work happening
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
             // then remove the spinner view controller
             child.willMove(toParent: nil)
             child.view.removeFromSuperview()
@@ -353,9 +370,25 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     @objc func updatePrices() {
         
+        /*CoinData.shared.getPrices()
+        
+        percentChange24Hr()
+        
+        CoinData.shared.getPercents()
+        
+        displayNetWorth()*/
+        
         createSpinnerView()
         
         CoinData.shared.getPrices()
+        
+        CoinData.shared.getYesterdaysClose()
+        
+        CoinData.shared.getClose()
+        
+        getFullName()
+        
+        retrieveFullName()
         
         percentChange24Hr()
         
@@ -386,11 +419,11 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         present(shareVC, animated: true, completion: nil)
     }
     
-    func updateSecureButton() {
+    /*func updateSecureButton() {
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(settingsTapped))
 
-    }
+    }*/
     
     @objc func settingsTapped() {
         
@@ -538,7 +571,8 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let coinVC = CoinViewController()
-        coinVC.coin = coins[indexPath.row]  //CoinData.shared.coins[indexPath.row]
+        coinVC.coin = coins[indexPath.row]
+        timer.invalidate()
         navigationController?.pushViewController(coinVC, animated: true)
     }
     

@@ -71,6 +71,8 @@ class AuthViewController: UIViewController {
                     
                     DispatchQueue.main.async {
                         
+                        self.createSpinnerView()
+                        
                         let cryptoTableVC = CryptoTableViewController()
                         cryptoTableVC.isModalInPresentation = true
                         
@@ -92,6 +94,24 @@ class AuthViewController: UIViewController {
               
         } else {
             print("User has not enrolled into using Biometrics")
+        }
+    }
+    
+    func createSpinnerView() {
+        let child = SpinnerViewController()
+        
+        // add the spinner view controller
+        addChild(child)
+        child.view.frame = view.frame
+        view.addSubview(child.view)
+        child.didMove(toParent: self)
+        
+        // wait five seconds to simulate some work happening
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            // then remove the spinner view controller
+            child.willMove(toParent: nil)
+            child.view.removeFromSuperview()
+            child.removeFromParent()
         }
     }
     

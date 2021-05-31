@@ -13,6 +13,8 @@ import UIKit
 
 var coins = [Coin]()
 
+var netWorth = Double()
+
 class CoinData {
     
     static let shared = CoinData()
@@ -82,15 +84,6 @@ class CoinData {
         html += "</ul>"
         
         return html
-    }
-    
-    func netWorthAsString() -> String {
-        var netWorth = 0.0
-        for coin in coins {
-            netWorth += coin.amount * coin.price
-        }
-        
-        return doubleToDollarString(double: netWorth)
     }
     
     func getPrices() {
@@ -259,6 +252,20 @@ class CoinData {
             return "ERROR"
         }
     }
+    
+    func netWorthAsString() -> String {
+        
+        netWorth = 0.00
+        
+        for coin in coins {
+            netWorth += coin.amount * coin.price
+        }
+        
+        let newNetWorth = doubleToDollarString(double: netWorth)
+        
+        return newNetWorth
+    }
+    
     
 }
 

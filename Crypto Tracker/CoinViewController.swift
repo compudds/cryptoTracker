@@ -313,7 +313,7 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
             }
         
             alert.addTextField { (textField2) in
-                textField2.placeholder = "Cost Basis"
+                textField2.placeholder = "Cost Basis $"
                 textField2.keyboardType = .decimalPad
                 if self.coin?.costBasis != 0.0 {
                     textField2.text = String(coin.costBasis)
@@ -321,7 +321,7 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
             }
             
             alert.addTextField { (textField3) in
-                textField3.placeholder = "Original Investment Amt."
+                textField3.placeholder = "Original Investment Amt. $"
                 textField3.keyboardType = .decimalPad
                 if self.coin?.investmentAmt != 0.0 {
                     textField3.text = String(coin.investmentAmt)
@@ -329,6 +329,7 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
             }
             
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
+               
                 if let text = alert.textFields?[0].text {
                     if let amount = Double(text) {
                         self.coin?.amount = amount

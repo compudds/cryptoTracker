@@ -10,19 +10,24 @@ import UIKit
 import LocalAuthentication
 //import Alamofire
 
-private let headerHeight : CGFloat = 100.0
+private let headerHeight : CGFloat = 150.0
 private let netWorthHeight : CGFloat = 45.0
 var namesData = [String]()
 var namesDataDic = [String:String]()
 var percentDic = [String:String]()
 var percentData = [String]()
-//var yesterdaysClose = Double()
+var profitOrLoss = Double()
+var totalInvested = Double()
 var yesterdayData = [String]()
 var yesterdayDic = [String:String]()
 
 class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     var amountLabel = UILabel()
+    
+    var profitOrLossLabel = UILabel()
+    
+    var profitOrLossAmtLabel = UILabel()
     
     var coin : Coin?
     
@@ -36,8 +41,6 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        //createSpinnerView()
         
         getSavedCryptoSymbols()
         
@@ -55,9 +58,8 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         navigationItem.rightBarButtonItems = [settingsButton,refreshButton]
         
-        /*if LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) {
-            updateSecureButton()
-        }*/
+        updatePrices()
+        
     }
     
     @objc func moveRows() {
@@ -66,7 +68,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         navigationItem.setLeftBarButton(UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(stopMoveRows)), animated: true)
         
-        timer.invalidate()
+        endTimer()
     }
     
     @objc func stopMoveRows() {
@@ -77,6 +79,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         timer = Timer.scheduledTimer(timeInterval: 75, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
         
+        print("Timer Started!!!")
         
     }
     
@@ -103,8 +106,6 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     override func viewDidAppear(_ animated: Bool) {
         
-        updatePrices()
-        
         noInternetConnection()
     }
     
@@ -114,26 +115,15 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             
             print("TableView Internet connection OK")
             
+            print("Timer Started!!!")
+            
             timer = Timer.scheduledTimer(timeInterval: 75, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
             
             print("Prices updated.")
             
             print("cryptoSymbols: \(cryptoSymbols)")
             
-            /*CoinData.shared.getPrices()
-            
-            CoinData.shared.getYesterdaysClose()
-            
-            CoinData.shared.getClose()
-            
-            getFullName()
-            
-            retrieveFullName()
-            
-            percentChange24Hr()
-            
-            CoinData.shared.getPercents()*/
-            
+           
         } else {
             
             print("Internet connection FAILED")
@@ -172,7 +162,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         child.didMove(toParent: self)
         
         // wait five seconds to simulate some work happening
-        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 8) {
             // then remove the spinner view controller
             child.willMove(toParent: nil)
             child.view.removeFromSuperview()
@@ -370,14 +360,6 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     @objc func updatePrices() {
         
-        /*CoinData.shared.getPrices()
-        
-        percentChange24Hr()
-        
-        CoinData.shared.getPercents()
-        
-        displayNetWorth()*/
-        
         createSpinnerView()
         
         CoinData.shared.getPrices()
@@ -427,6 +409,8 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     @objc func settingsTapped() {
         
+        endTimer()
+        
         let settings = SettingsViewController()
         settings.isModalInPresentation = true
         navigationController?.pushViewController(settings, animated: true)
@@ -446,7 +430,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     }
     
     func createHeaderView() -> UIView {
-        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: headerHeight))
+        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: headerHeight/2))
         headerView.backgroundColor = UIColor.white
         let networthLabel = UILabel(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: netWorthHeight))
         networthLabel.text = "Crypto Net Worth"
@@ -455,19 +439,104 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         headerView.addSubview(networthLabel)
         
-        amountLabel.frame = CGRect(x: 0, y: netWorthHeight, width: view.frame.size.width, height: headerHeight - netWorthHeight)
+        amountLabel.frame = CGRect(x: 0, y: netWorthHeight, width: view.frame.size.width, height: (headerHeight / 2) - netWorthHeight)
         amountLabel.textAlignment = .center
         amountLabel.font = UIFont.boldSystemFont(ofSize: 40.0)
         amountLabel.textColor = .black
         headerView.addSubview(amountLabel)
+        
+        profitOrLossLabel = UILabel(frame: CGRect(x: 0, y: 60, width: view.frame.size.width, height: headerHeight/2))
+        //profitOrLossLabel.text = "Profit or Loss"
+        profitOrLossLabel.textAlignment = .center
+        //profitOrLossLabel.textColor = .black
+        
+        
+        headerView.addSubview(profitOrLossLabel)
+        
+        profitOrLossAmtLabel.frame = CGRect(x: 0, y: netWorthHeight + 65 , width: view.frame.size.width, height: (headerHeight / 2) - netWorthHeight)
+        profitOrLossAmtLabel.textAlignment = .center
+        profitOrLossAmtLabel.font = UIFont.boldSystemFont(ofSize: 35.0)
+        headerView.addSubview(profitOrLossAmtLabel)
         
         displayNetWorth()
         
         return headerView
     }
     
+    func getTotalInvested() {
+        
+        totalInvested = 0.00
+        
+        for symbol in cryptoSymbols {
+            
+            var names = [Any]()
+            
+            let investAmt = UserDefaults.standard.double(forKey: symbol + "investmentAmt")
+            
+            names = [investAmt]
+            
+            for name in names {
+                
+                totalInvested = name as! Double + totalInvested
+                
+            }
+                
+        }
+        print("TotalInvested: \(totalInvested)")
+    }
+    
     func displayNetWorth() {
+        
+        getTotalInvested()
+        
         amountLabel.text = "$" + CoinData.shared.netWorthAsString()
+        profitOrLoss = netWorth - totalInvested
+        let polString = doubleToMoneyString(double: profitOrLoss)
+        let perPOL = doubleToString(double: (profitOrLoss / totalInvested) * 100)
+        profitOrLossAmtLabel.text = polString + " \(perPOL)%"
+        
+        if totalInvested < profitOrLoss {
+            
+            profitOrLossLabel.text = "Net Profit"
+            profitOrLossLabel.textColor = UIColor(red: 0/255, green: 170/255, blue: 14/255, alpha: 1.0)
+            profitOrLossAmtLabel.textColor = UIColor(red: 0/255, green: 170/255, blue: 14/255, alpha: 1.0)
+            
+        }
+        
+        if totalInvested > profitOrLoss {
+            profitOrLossLabel.text = "Net Loss"
+            profitOrLossLabel.textColor = .red
+            profitOrLossAmtLabel.textColor = .red
+        }
+        
+        if totalInvested == profitOrLoss {
+            profitOrLossLabel.text = "Even"
+            profitOrLossLabel.textColor = .black
+            profitOrLossAmtLabel.textColor = .black
+        }
+    }
+    
+    func doubleToMoneyString(double: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.numberStyle = .currency
+        if let fancyPrice = formatter.string(from: NSNumber(floatLiteral: double)) {
+            return fancyPrice
+        } else {
+            return "ERROR"
+        }
+    }
+    
+    func doubleToString(double: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 2
+        if let fancyPrice = formatter.string(from: NSNumber(floatLiteral: double)) {
+            return fancyPrice
+        } else {
+            return "ERROR"
+        }
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -572,7 +641,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let coinVC = CoinViewController()
         coinVC.coin = coins[indexPath.row]
-        timer.invalidate()
+        endTimer()
         navigationController?.pushViewController(coinVC, animated: true)
     }
     
@@ -625,7 +694,8 @@ class SpinnerViewController: UIViewController {
     
     override func loadView() {
         view = UIView()
-        view.backgroundColor = UIColor(white: 0, alpha: 0.6)
+        view.backgroundColor = UIColor(white: 1, alpha: 0.7)
+        //view.backgroundColor = UIColor(white: 0, alpha: 0.7)
         
         spinner.translatesAutoresizingMaskIntoConstraints = false
         spinner.startAnimating()

@@ -577,8 +577,8 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         let valueToDollar = String(format: "%.2f", value)
         
-        
-        if name > coin.yesterdayClose {
+        if coin.percentChange > "0.00" {
+        //if name > coin.yesterdayClose {
             
             //print("Now: $\(name) Close: $\(coin.yesterdayClose)")
             
@@ -597,8 +597,8 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             }
             
         }
-            
-        if name < coin.yesterdayClose {
+        if coin.percentChange < "0.00" {
+        //if name < coin.yesterdayClose {
             
             cell.textLabel?.textColor = UIColor.red
             

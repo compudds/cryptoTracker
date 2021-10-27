@@ -112,6 +112,7 @@ class AuthViewController: UIViewController {
             child.willMove(toParent: nil)
             child.view.removeFromSuperview()
             child.removeFromParent()
+            child.spinner.stopAnimating()
         }
     }
     

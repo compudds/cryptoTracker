@@ -39,6 +39,8 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     var activityIndicator: UIActivityIndicatorView!
     
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -60,6 +62,25 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         updatePrices()
         
+        let refreshControl = UIRefreshControl()
+        
+        refreshControl.attributedTitle = NSAttributedString(string: "Fetching Crypto Data ...")
+        
+        refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
+        
+        refreshControl.tintColor = UIColor(red:0.25, green:0.72, blue:0.85, alpha:1.0)
+        
+        self.refreshControl = refreshControl
+        
+        
+    }
+    
+    @objc func refresh(_ sender: AnyObject) {
+        
+        updatePrices()
+        
+        refreshControl!.endRefreshing()
+       
     }
     
     @objc func moveRows() {
@@ -162,11 +183,12 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         child.didMove(toParent: self)
         
         // wait five seconds to simulate some work happening
-        DispatchQueue.main.asyncAfter(deadline: .now() + 8) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             // then remove the spinner view controller
             child.willMove(toParent: nil)
             child.view.removeFromSuperview()
             child.removeFromParent()
+            child.spinner.stopAnimating()
         }
     }
     
@@ -360,8 +382,6 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     @objc func updatePrices() {
         
-        createSpinnerView()
-        
         CoinData.shared.getPrices()
         
         CoinData.shared.getYesterdaysClose()
@@ -376,10 +396,16 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         CoinData.shared.getPercents()
         
-        displayNetWorth()
-        
-        tableView.reloadData()
-        
+        DispatchQueue.main.async {
+            
+            //self.createSpinnerView()
+            
+            self.displayNetWorth()
+            
+            self.tableView.reloadData()
+            
+        }
+       
     }
 
     
@@ -420,8 +446,9 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     override func viewWillAppear(_ animated: Bool) {
         
         CoinData.shared.delegate = self
-        tableView.reloadData()
         displayNetWorth()
+        tableView.reloadData()
+        
     }
     
     func newPrices() {
@@ -614,7 +641,24 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             }
             
         }
+        
+        if (coin.percentChange == "0.00" || coin.percentChange == "") {
             
+            cell.textLabel?.textColor = UIColor.blue
+            
+            if coin.amount != 0.0 {
+                
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%\rShares: \(coin.amount)\rValue: $\(valueToDollar)\rCost: $\(coin.costBasis)\rGain/Loss: $\(coin.gainLossAsString())\r% Gain/Loss: \(doubleStr)%"
+                
+                
+            } else {
+                
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%"
+                
+            }
+            
+        }
+        
         if name == coin.yesterdayClose {
             
             cell.textLabel?.textColor = UIColor.blue

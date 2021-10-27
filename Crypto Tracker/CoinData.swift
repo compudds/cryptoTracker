@@ -87,6 +87,7 @@ class CoinData {
     }
     
     func getPrices() {
+        
         var listOfSymbols = ""
         for coin in coins {
             listOfSymbols += coin.symbol

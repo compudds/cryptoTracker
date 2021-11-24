@@ -42,14 +42,14 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
         chart.delegate = self
         
         //labelLeadingMarginInitialConstant = labelLeadingMarginConstraint.constant
-        
+       
         if let coin = coin {
             CoinData.shared.delegate = self
             edgesForExtendedLayout = []
             view.backgroundColor = UIColor.white
             title = coin.symbol
             
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editTapped))
+            //navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editTapped))
             
             let historyLabel = UILabel(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: historyHeight))
             historyLabel.text = "Historical Information for \(coin.name) - \(coin.symbol)"
@@ -124,8 +124,19 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
             
         }
         
+        /*if #available(iOS 13, *)
+            {
+            let statusBar = UIView(frame: (UIApplication.shared.keyWindow?.windowScene?.statusBarManager?.statusBarFrame)!)
+                statusBar.backgroundColor = UIColor.systemBackground
+                UIApplication.shared.keyWindow?.addSubview(statusBar)
+            }*/
+        
     }
     
+    override var prefersStatusBarHidden: Bool {
+        return false
+    }
+
     override func viewDidAppear(_ animated: Bool) {
         
         noInternetConnection()
@@ -302,7 +313,7 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
     }
     
     @objc func editTapped() {
-        if let coin = coin {
+        /*if let coin = coin {
             let alert = UIAlertController(title: "How much \(coin.symbol) do you own & cost basis?", message: nil, preferredStyle: .alert)
             alert.addTextField { (textField) in
                 textField.placeholder = "Amount Owned"
@@ -313,7 +324,7 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
             }
         
             alert.addTextField { (textField2) in
-                textField2.placeholder = "Cost Basis $"
+                textField2.placeholder = "Price/share $"
                 textField2.keyboardType = .decimalPad
                 if self.coin?.costBasis != 0.0 {
                     textField2.text = String(coin.costBasis)
@@ -321,12 +332,25 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
             }
             
             alert.addTextField { (textField3) in
-                textField3.placeholder = "Original Investment Amt. $"
+                textField3.placeholder = "Commission/Gas/Fees $"
                 textField3.keyboardType = .decimalPad
-                if self.coin?.investmentAmt != 0.0 {
-                    textField3.text = String(coin.investmentAmt)
+                if self.coin?.amount != 0.0 {
+                    /*let amt = coin.amount * coin.costBasis
+                    let amt2 = coin.investmentAmt - amt
+                    let amt3 = self.doubleToMoneyString(double: amt2)
+                    textField3.text = String(amt3)*/
+                    textField3.text = String(coin.gas)
                 }
             }
+            
+            alert.addTextField { (textField4) in
+                textField4.placeholder = "Original Investment Amt. $"
+                textField4.keyboardType = .decimalPad
+                if self.coin?.investmentAmt != 0.0 {
+                    textField4.text = String(coin.investmentAmt)
+                }
+            }
+            
             
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
                
@@ -348,6 +372,13 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
                 }
                 
                 if let text = alert.textFields?[2].text {
+                    if let gas = Double(text) {
+                        self.coin?.gas = gas
+                        UserDefaults.standard.set(gas, forKey: coin.symbol + "gas")
+                        self.newPrices()
+                    }
+                    
+                if let text = alert.textFields?[3].text {
                     if let invAmt = Double(text) {
                         self.coin?.investmentAmt = invAmt
                         UserDefaults.standard.set(invAmt, forKey: coin.symbol + "investmentAmt")
@@ -357,9 +388,12 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
                 }
                 
                 
+                    
+                }
+                
             }))
             self.present(alert, animated: true, completion: nil)
-        }
+        }*/
     }
     
     func newHistory() {
@@ -376,7 +410,7 @@ class CoinViewController: UIViewController, CoinDataDelegate, ChartDelegate {
             priceLabel.text = "Price $" + coin.priceAsString() + " Cost $\(coin.costBasis)"
             worthLabel.text = "$" + coin.amountAsString()
             youOwnLabel.text = "You own: \(coin.amount) \(coin.symbol)"
-            costBasisLabel.text = "Cost Basis: \(coin.costBasis)"
+            costBasisLabel.text = "Cost Basis: $" +  doubleToMoneyString(double: Double(coin.costBasis))
         }
     }
     

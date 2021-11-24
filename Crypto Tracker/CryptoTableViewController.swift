@@ -20,6 +20,7 @@ var profitOrLoss = Double()
 var totalInvested = Double()
 var yesterdayData = [String]()
 var yesterdayDic = [String:String]()
+var coinSymbol = String()
 
 class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
@@ -39,10 +40,10 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     var activityIndicator: UIActivityIndicatorView!
     
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //clearUserDefaults()
         
         getSavedCryptoSymbols()
         
@@ -56,11 +57,13 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         let settingsButton = UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(settingsTapped))
         
+        let addButton = UIBarButtonItem(title: "Add", style: .plain, target: self, action: #selector(addButtonTapped))
+        
         let refreshButton = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(updatePrices))
         
-        navigationItem.rightBarButtonItems = [settingsButton,refreshButton]
+        navigationController?.navigationBar.backgroundColor = .white
         
-        updatePrices()
+        navigationItem.rightBarButtonItems = [settingsButton,addButton, refreshButton]
         
         let refreshControl = UIRefreshControl()
         
@@ -72,8 +75,17 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         self.refreshControl = refreshControl
         
+        runCoinTotals()
         
     }
+    
+    @objc func addButtonTapped() {
+        
+        endTimer()
+       
+        navigationController?.pushViewController(AddSingleViewController(), animated: true)
+    }
+    
     
     @objc func refresh(_ sender: AnyObject) {
         
@@ -85,11 +97,12 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     @objc func moveRows() {
         
+        endTimer()
+        
         self.tableView.isEditing = true
         
         navigationItem.setLeftBarButton(UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(stopMoveRows)), animated: true)
         
-        endTimer()
     }
     
     @objc func stopMoveRows() {
@@ -134,9 +147,11 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         if Reachability.isConnectedToNetwork() == true {
             
-            print("TableView Internet connection OK")
+            print("CryptoTableView Internet connection OK")
             
             print("Timer Started!!!")
+            
+            runCoinTotals()
             
             timer = Timer.scheduledTimer(timeInterval: 75, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
             
@@ -346,10 +361,6 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
                                         
                                         let name = String(format: "%.2f", name1)
                                         
-                                        //percentData.append(name)
-                                        
-                                        //UserDefaults.standard.set(name, forKey: symbol + "percent")
-                                        
                                         let newValue = percentDic.updateValue(name, forKey: symbol)
                                         
                                         UserDefaults.standard.set(newValue, forKey: "percentDic")
@@ -398,7 +409,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         DispatchQueue.main.async {
             
-            //self.createSpinnerView()
+            self.runCoinTotals()
             
             self.displayNetWorth()
             
@@ -410,6 +421,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
 
     
     @objc func reportTapped() {
+        endTimer()
         let formatter = UIMarkupTextPrintFormatter(markupText: CoinData.shared.html())
         let render = UIPrintPageRenderer()
         render.addPrintFormatter(formatter, startingAtPageAt: 0)
@@ -425,13 +437,9 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         UIGraphicsEndPDFContext()
         let shareVC = UIActivityViewController(activityItems: [pdfData], applicationActivities: nil)
         present(shareVC, animated: true, completion: nil)
-    }
-    
-    /*func updateSecureButton() {
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(settingsTapped))
-
-    }*/
+        timer = Timer.scheduledTimer(timeInterval: 75, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
+    }
     
     @objc func settingsTapped() {
         
@@ -490,22 +498,41 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         return headerView
     }
     
+    func clearUserDefaults() {
+        
+        if let appDomain = Bundle.main.bundleIdentifier {
+        
+            UserDefaults.standard.removePersistentDomain(forName: appDomain)
+        
+        }
+        
+    }
+    
     func getTotalInvested() {
         
         totalInvested = 0.00
         
         for symbol in cryptoSymbols {
             
-            var names = [Any]()
+            //var names = [Any]()
             
-            let investAmt = UserDefaults.standard.double(forKey: symbol + "investmentAmt")
+            let investAmt = UserDefaults.standard.object(forKey: symbol + "totalCostBasis1") as? [Any]
             
-            names = [investAmt]
-            
-            for name in names {
+            if investAmt != nil {
                 
-                totalInvested = name as! Double + totalInvested
+                var strToDouble = String()
                 
+                for name in investAmt! {
+                   
+                    strToDouble = name as? String ?? "" + strToDouble
+
+                }
+                
+                totalInvested = Double(strToDouble)!
+                
+            } else {
+                
+                print("names array is nil.")
             }
                 
         }
@@ -514,7 +541,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     func displayNetWorth() {
         
-        getTotalInvested()
+        //getTotalInvested()
         
         amountLabel.text = "$" + CoinData.shared.netWorthAsString()
         profitOrLoss = netWorth - totalInvested
@@ -522,7 +549,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         let perPOL = doubleToString(double: (profitOrLoss / totalInvested) * 100)
         profitOrLossAmtLabel.text = polString + " \(perPOL)%"
         
-        if totalInvested < profitOrLoss {
+        if profitOrLoss > 0.00 {
             
             profitOrLossLabel.text = "Net Profit"
             profitOrLossLabel.textColor = UIColor(red: 0/255, green: 170/255, blue: 14/255, alpha: 1.0)
@@ -530,16 +557,16 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             
         }
         
-        if totalInvested > profitOrLoss {
+        if profitOrLoss < 0.00 {
             profitOrLossLabel.text = "Net Loss"
             profitOrLossLabel.textColor = .red
             profitOrLossAmtLabel.textColor = .red
         }
         
-        if totalInvested == profitOrLoss {
+        if profitOrLoss == 0.00 {
             profitOrLossLabel.text = "Even"
-            profitOrLossLabel.textColor = .black
-            profitOrLossAmtLabel.textColor = .black
+            profitOrLossLabel.textColor = .blue
+            profitOrLossAmtLabel.textColor = .blue
         }
     }
     
@@ -580,63 +607,131 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-        return 268
+        return 380
+    }
+    
+    func runCoinTotals() {
+        
+        var coinAmount = Double()
+        
+        var coinAmount1 = Double()
+        
+        var items = [Any]()
+        
+        let array = ["totalAmount","totalPrice","totalCostBasis","totalGas"]
+        
+        for symbol in cryptoSymbols {
+            
+            print(symbol)
+            
+            coinAmount = 0.0
+            
+            for amt in array {
+                
+                var investAmt = UserDefaults.standard.object(forKey: symbol + "\(amt)") as? [Any]
+                
+                if investAmt != nil {
+                    
+                    for obj in investAmt ?? [] {
+                        
+                        items.append(obj)
+                    }
+                    
+                    for item in items {
+                        
+                        coinAmount = item as? Double ?? 0.0 + coinAmount
+                        
+                        coinAmount1 = coinAmount + coinAmount1
+                        
+                    }
+                    
+                    if amt == "totalPrice" {
+                        
+                        coinAmount1 = coinAmount1 / Double(items.count)
+                    }
+                    
+                    if amt == "totalCostBasis" {
+                        
+                        totalInvested = coinAmount1
+                    }
+                    
+                    UserDefaults.standard.set(Double(coinAmount1), forKey: symbol + "\(amt)" + "1")
+                    
+                    print("\(symbol)\(amt): \(items)")
+                    
+                    print("\(amt): \(coinAmount1)")
+                    
+                    coinAmount1 = 0.0
+                    
+                    investAmt = []
+                    
+                    items.removeAll()
+                 
+                   
+                } else {
+                    
+                    print("investAmt is nil.")
+                }
+                
+            }
+            
+        }
+       
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = UITableViewCell()
         
-        cell.textLabel!.numberOfLines = 9
+        cell.textLabel!.numberOfLines = 15
         
         cell.textLabel!.lineBreakMode = .byWordWrapping
         
-        let coin = coins[indexPath.row]  //CoinData.shared.coins[indexPath.row]
+        let coin = coins[indexPath.row]
         
         let name = String(format: "%.4f", coin.price)
         
-        coin.gainLoss = (coin.price * coin.amount) - (coin.costBasis * coin.amount)
-        
-        coin.percentGainLoss = (coin.gainLoss / coin.investmentAmt) * 100
-        
         let doubleStr = String(format: "%.2f", coin.percentGainLoss)
         
-        let value = coin.price * coin.amount
+        let value = coin.currentPrice * coin.totalAmount
         
-        let valueToDollar = String(format: "%.2f", value)
+        let valueToDollar = String(format: "%.5f", value)
+        
+        coin.gainLoss = ((value - coin.totalCostBasis) - coin.totalGas)
+        
+        let gainLossStr = String(format: "%.2f", coin.gainLoss)
+        
+        coin.percentGainLoss = (coin.gainLoss / coin.totalInvestmentAmt) * 100
         
         if coin.percentChange > "0.00" {
-        //if name > coin.yesterdayClose {
-            
-            //print("Now: $\(name) Close: $\(coin.yesterdayClose)")
-            
+        
             cell.textLabel?.textColor = UIColor(red: 0/255, green: 170/255, blue: 14/255, alpha: 1.0)
-            
-            //cell.textLabel?.textColor = UIColor.green
             
             if coin.amount != 0.0 {
                 
-                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%\rShares: \(coin.amount)\rValue: $\(valueToDollar)\rCost: $\(coin.costBasis)\rGain/Loss: $\(coin.gainLossAsString())\r% Gain/Loss: \(doubleStr)%"
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.currentPriceAsString())  \r\(coin.percentChange)%\rShares: \(coin.totalAmount)\rValue: $\(valueToDollar)\rGas: $\(coin.totalGas)\rCost: $\(coin.totalCostBasis)\rGain/Loss: $\(gainLossStr)\r% Gain/Loss: \(doubleStr)%"
                 
+               
             } else {
                 
-                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%"
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.currentPriceAsString())  \r\(coin.percentChange)%"
                 
             }
             
         }
         if coin.percentChange < "0.00" {
-        //if name < coin.yesterdayClose {
-            
+       
             cell.textLabel?.textColor = UIColor.red
             
             if coin.amount != 0.0 {
                 
-                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%\rShares: \(coin.amount)\rValue: $\(valueToDollar)\rCost: $\(coin.costBasis)\rGain/Loss: $\(coin.gainLossAsString())\r% Gain/Loss: \(doubleStr)%"
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.currentPriceAsString())  \r\(coin.percentChange)%\rShares: \(coin.totalAmount)\rValue: $\(valueToDollar)\rGas: $\(coin.totalGas)\rCost: $\(coin.totalCostBasis)\rGain/Loss: $\(gainLossStr)\r% Gain/Loss: \(doubleStr)%"
+                
                 
                 
             } else {
                 
-                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%"
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.currentPriceAsString())  \r\(coin.percentChange)%"
                 
             }
             
@@ -648,12 +743,13 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             
             if coin.amount != 0.0 {
                 
-                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%\rShares: \(coin.amount)\rValue: $\(valueToDollar)\rCost: $\(coin.costBasis)\rGain/Loss: $\(coin.gainLossAsString())\r% Gain/Loss: \(doubleStr)%"
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.currentPriceAsString())  \r\(coin.percentChange)%\rShares: \(coin.totalAmount)\rValue: $\(valueToDollar)\rGas: $\(coin.totalGas)\rCost: $\(coin.totalCostBasis)\rGain/Loss: $\(gainLossStr)\r% Gain/Loss: \(doubleStr)%"
+                
                 
                 
             } else {
                 
-                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%"
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.currentPriceAsString())  \r\(coin.percentChange)%"
                 
             }
             
@@ -666,7 +762,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             
             if coin.amount != 0.0 {
                 
-                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.priceAsString())  \r\(coin.percentChange)%\rShares: \(coin.amount)\rValue: $\(valueToDollar)\rCost: $\(coin.costBasis)\rGain/Loss: $\(coin.gainLossAsString())\r% Gain/Loss: \(doubleStr)%"
+                cell.textLabel?.text = "\(coin.name) - \(coin.symbol)\r$\(coin.currentPriceAsString())  \r\(coin.percentChange)%\rShares: \(coin.totalAmount)\rValue: $\(valueToDollar)\rGas: $\(coin.totalGas)\rCost: $\(coin.totalCostBasis)\rGain/Loss: $\(gainLossStr)\r% Gain/Loss: \(doubleStr)%"
                 
                 
             } else {
@@ -683,10 +779,43 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let coinVC = CoinViewController()
-        coinVC.coin = coins[indexPath.row]
+        
         endTimer()
-        navigationController?.pushViewController(coinVC, animated: true)
+        
+        let alert = UIAlertController(title: "Historical Charts or Buys?", message: "Please pick one.", preferredStyle: UIAlertController.Style.alert)
+        
+        alert.addAction(UIAlertAction(title: "Historical charts", style: .default, handler: { [self] action in
+            
+            alert.dismiss(animated: true, completion: nil)
+            
+            let coinVC = CoinViewController()
+            coinVC.coin = coins[indexPath.row]
+            self.navigationController?.pushViewController(coinVC, animated: true)
+            
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Buys", style: .default, handler: { action in
+            
+            alert.dismiss(animated: true, completion: nil)
+            
+            let coinVC = SingleTableViewController()
+            coinVC.coin = coins[indexPath.row]
+            cellId = coinVC.coin!.id
+            coinSymbol = coinVC.coin!.symbol
+            print("coinSymbol: \(coinSymbol)")
+            self.navigationController?.pushViewController(coinVC, animated: true)
+            
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+            
+            alert.dismiss(animated: true, completion: nil)
+        
+            
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
+        
     }
     
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -698,6 +827,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     }
     
     override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        
         let movedObject = cryptoSymbols[sourceIndexPath.row]
         cryptoSymbols.remove(at: sourceIndexPath.row)
         cryptoSymbols.insert(movedObject, at: destinationIndexPath.row)
@@ -716,6 +846,8 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
+        endTimer()
+        
         if editingStyle == .delete {
             
             cryptoSymbols.remove(at: indexPath.row)
@@ -727,8 +859,11 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             tableView.deleteRows(at: [indexPath], with: .fade)
             
             tableView.reloadData()
+            
+            timer = Timer.scheduledTimer(timeInterval: 75, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
         
         }
+        
     }
 
 }

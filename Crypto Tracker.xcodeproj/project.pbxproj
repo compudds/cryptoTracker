@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0732722B272C27110041D583 /* SingleTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0732722A272C27110041D583 /* SingleTableViewController.swift */; };
+		0732722D272C332B0041D583 /* AddSingleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0732722C272C332B0041D583 /* AddSingleViewController.swift */; };
+		0732722F272D7BDE0041D583 /* EditSingleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0732722E272D7BDE0041D583 /* EditSingleViewController.swift */; };
 		07C56BC422B874CF00C83360 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C56BC322B874CF00C83360 /* SettingsViewController.swift */; };
 		07C56BC622B950C000C83360 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07C56BC522B950C000C83360 /* Images.xcassets */; };
 		07DD594D22B2EF2900E0D179 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07DD594C22B2EF2900E0D179 /* Reachability.swift */; };
@@ -20,6 +23,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0732722A272C27110041D583 /* SingleTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleTableViewController.swift; sourceTree = "<group>"; };
+		0732722C272C332B0041D583 /* AddSingleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSingleViewController.swift; sourceTree = "<group>"; };
+		0732722E272D7BDE0041D583 /* EditSingleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditSingleViewController.swift; sourceTree = "<group>"; };
 		076276C922B2B09400A32C98 /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Carthage/Build/iOS/Alamofire.framework; sourceTree = "<group>"; };
 		07C56BC322B874CF00C83360 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		07C56BC522B950C000C83360 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -82,6 +88,9 @@
 				B8C38FA7209756B900E01981 /* AppDelegate.swift */,
 				B8559B61209DCBE900C9ABEA /* AuthViewController.swift */,
 				B8C38FB92097577600E01981 /* CryptoTableViewController.swift */,
+				0732722C272C332B0041D583 /* AddSingleViewController.swift */,
+				0732722A272C27110041D583 /* SingleTableViewController.swift */,
+				0732722E272D7BDE0041D583 /* EditSingleViewController.swift */,
 				B8559B5F209C393000C9ABEA /* CoinViewController.swift */,
 				B8C38FBB209758FA00E01981 /* CoinData.swift */,
 				07C56BC322B874CF00C83360 /* SettingsViewController.swift */,
@@ -220,7 +229,10 @@
 				B8C38FBC209758FA00E01981 /* CoinData.swift in Sources */,
 				B8C38FBA2097577600E01981 /* CryptoTableViewController.swift in Sources */,
 				07DD594D22B2EF2900E0D179 /* Reachability.swift in Sources */,
+				0732722B272C27110041D583 /* SingleTableViewController.swift in Sources */,
 				B8559B62209DCBE900C9ABEA /* AuthViewController.swift in Sources */,
+				0732722D272C332B0041D583 /* AddSingleViewController.swift in Sources */,
+				0732722F272D7BDE0041D583 /* EditSingleViewController.swift in Sources */,
 				B8C38FA8209756B900E01981 /* AppDelegate.swift in Sources */,
 				B8559B60209C393000C9ABEA /* CoinViewController.swift in Sources */,
 				07C56BC422B874CF00C83360 /* SettingsViewController.swift in Sources */,

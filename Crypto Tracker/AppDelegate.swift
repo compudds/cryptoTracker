@@ -17,7 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         window = UIWindow(frame: UIScreen.main.bounds)
-        
+       
         if LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) && UserDefaults.standard.bool(forKey: "secure") {
             let authVC = AuthViewController()
             window?.rootViewController = authVC
@@ -27,7 +27,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             window?.rootViewController = navController
         }
         
-       
         window?.makeKeyAndVisible()
         
         return true
@@ -38,6 +37,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
         CryptoTableViewController().endTimer()
         
+        /*window = UIWindow(frame: UIScreen.main.bounds)
+        
+        let authVC = AuthViewController()
+        
+        window?.rootViewController = authVC
+        
+        window?.makeKeyAndVisible()*/
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {

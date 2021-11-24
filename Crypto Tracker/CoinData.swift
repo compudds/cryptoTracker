@@ -15,6 +15,8 @@ var coins = [Coin]()
 
 var netWorth = Double()
 
+var coinNetWorth = Double()
+
 class CoinData {
     
     static let shared = CoinData()
@@ -29,7 +31,7 @@ class CoinData {
             
             if symbols2!.isEmpty  {
                 
-                let symbols1 = ["BTC","XRP","XMR","ETH","DOGE","HOGE","LTC","BCH","EOS","BNB","BSV","ADA","XLM","ZEC","DASH","NEO"]
+                let symbols1 = ["HOGE","AKITA","BTC","XRP","XMR","PI","ETH","DOGE","SHIB","LTC","BCH","EOS","BNB","BSV","ADA","XLM","ZEC","DASH","NEO"]
                 
                 UserDefaults.standard.set(symbols1, forKey: "symbols")
                 
@@ -56,7 +58,7 @@ class CoinData {
             
         } else {
             
-            let symbols1 = ["BTC","XRP","XMR","ETH","DOGE","HOGE","LTC","BCH","EOS","BNB","BSV","ADA","XLM","ZEC","DASH","NEO"]
+            let symbols1 = ["HOGE","AKITA","BTC","XRP","XMR","PI","ETH","DOGE","SHIB","LTC","BCH","EOS","BNB","BSV","ADA","XLM","ZEC","DASH","NEO"]
             
             UserDefaults.standard.set(symbols1, forKey: "symbols")
             
@@ -110,8 +112,8 @@ class CoinData {
                 for coin in coins {
                     if let coinJSON = object[coin.symbol] as? [String:Double] {
                         if let price = coinJSON["USD"] {
-                            coin.price = price
-                            UserDefaults.standard.set(price, forKey: coin.symbol)
+                            coin.currentPrice = price
+                            UserDefaults.standard.set(price, forKey: coin.symbol + "currentPrice")
                         }
                     }
                 }
@@ -257,21 +259,51 @@ class CoinData {
     func netWorthAsString() -> String {
         
         netWorth = 0.00
-        
-        for coin in coins {
-            netWorth += coin.amount * coin.price
-        }
+       
+            for coin in coins {
+            
+                let totAmt = UserDefaults.standard.double(forKey: coin.symbol + "totalAmount1")
+            
+                //netWorth += (coin.totalAmount * coin.currentPrice)
+            
+                netWorth += (totAmt * coin.currentPrice)
+                
+            }
         
         let newNetWorth = doubleToDollarString(double: netWorth)
         
         return newNetWorth
     }
     
+    func coinNetWorthAsString() -> String {
+        
+        coinNetWorth = 0.00
+        
+        for coin in coins {
+            
+            if coin.symbol == coinSymbol {
+                
+                let totAmt = UserDefaults.standard.double(forKey: coin.symbol + "totalAmount1")
+            
+           
+                coinNetWorth += (totAmt * coin.currentPrice)
+                
+                //coinNetWorth += (coin.totalAmount * coin.currentPrice)
+                
+            }
+            
+        }
+        
+        let newCoinNetWorth = doubleToDollarString(double: coinNetWorth)
+        
+        return newCoinNetWorth
+    }
+    
     
 }
 
 
-@objc protocol CoinDataDelegate : class {
+@objc protocol CoinDataDelegate : AnyObject {
     @objc optional func newPrices()
     @objc optional func newHistory()
     @objc optional func newName()
@@ -282,27 +314,50 @@ class CoinData {
 class Coin {
     var symbol = ""
     var image = UIImage()
-    var price = 0.0
-    var amount = 0.0
+    var price = 0.00
+    var totalPrice = 0.00
+    var totalAmount = 0.00
+    var totalCostBasis = 0.00
+    var totalGas = 0.00
+    var totalInvestmentAmt = 0.00
+    var currentPrice = 0.00
+    var amount = 0.00
     var historicalData = [Double]()
     var name = String()
     var percentChange = String()
     var yesterdayClose = String()
-    var costBasis = 0.0
-    var gainLoss = 0.0
-    var percentGainLoss = 0.0
-    var investmentAmt = 0.0
+    var costBasis = 0.00
+    var gainLoss = 0.00
+    var percentGainLoss = 0.00
+    var investmentAmt = 0.00
+    var gas = 0.00
+    var id = String()
     
     init(symbol: String) {
         self.symbol = symbol
         if let image = UIImage(named: symbol) {
             self.image = resizeImage(image: image, newWidth: 100)
         }
-        self.price = UserDefaults.standard.double(forKey: symbol)
-        //self.percentChange = UserDefaults.standard.string(forKey: symbol + "percent")!
+        self.price = UserDefaults.standard.double(forKey: symbol + "price") 
+        self.totalPrice = UserDefaults.standard.double(forKey: symbol + "totalPrice1")
+        
+        self.currentPrice = UserDefaults.standard.double(forKey: symbol + "currentPrice")
+        
+        //shares
         self.amount = UserDefaults.standard.double(forKey: symbol + "amount")
+        self.totalAmount = UserDefaults.standard.double(forKey: symbol + "totalAmount1")
+        
         self.costBasis = UserDefaults.standard.double(forKey: symbol + "costBasis")
+        self.totalCostBasis = UserDefaults.standard.double(forKey: symbol + "totalCostBasis1")
+        
         self.investmentAmt = UserDefaults.standard.double(forKey: symbol + "investmentAmt")
+        self.totalInvestmentAmt = UserDefaults.standard.double(forKey: symbol + "totalInvestmentAmt1")
+        
+        self.gas = UserDefaults.standard.double(forKey: symbol + "gas")
+        self.totalGas = UserDefaults.standard.double(forKey: symbol + "totalGas1")
+        
+        self.id = UserDefaults.standard.string(forKey: symbol + "id") ?? ""
+        
         if let history = UserDefaults.standard.array(forKey: symbol + "history") as? [Double] {
             self.historicalData = history
         }
@@ -461,6 +516,14 @@ class Coin {
         }
         
         return CoinData.shared.doubleToMoneyString(double: price)
+    }
+    
+    func currentPriceAsString() -> String {
+        if currentPrice == 0.0 {
+            return "Loading..."
+        }
+        
+        return CoinData.shared.doubleToMoneyString(double: currentPrice)
     }
     
     func amountAsString() -> String {

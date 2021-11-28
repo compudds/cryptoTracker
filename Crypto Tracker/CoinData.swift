@@ -284,7 +284,6 @@ class CoinData {
             if coin.symbol == coinSymbol {
                 
                 let totAmt = UserDefaults.standard.double(forKey: coin.symbol + "totalAmount1")
-            
            
                 coinNetWorth += (totAmt * coin.currentPrice)
                 
@@ -338,6 +337,7 @@ class Coin {
         if let image = UIImage(named: symbol) {
             self.image = resizeImage(image: image, newWidth: 100)
         }
+        
         self.price = UserDefaults.standard.double(forKey: symbol + "price") 
         self.totalPrice = UserDefaults.standard.double(forKey: symbol + "totalPrice1")
         

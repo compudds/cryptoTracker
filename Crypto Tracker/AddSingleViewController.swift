@@ -10,7 +10,7 @@ import UIKit
 
 private let headerHeight : CGFloat = 25.0
 var addSingleBuy = [Dictionary<String,String>()]  //[String:String]]()
-var singleCell = [Dictionary<String,String>()]  //[[String:String]]()
+var singleCell = [[String:Any]]()  //[Dictionary<String,String>()]  //[[String:String]]()
 
 class AddSingleViewController: UIViewController, CoinDataDelegate, UITextFieldDelegate {
     
@@ -176,6 +176,8 @@ class AddSingleViewController: UIViewController, CoinDataDelegate, UITextFieldDe
     
     override func viewDidAppear(_ animated: Bool) {
         
+        //singleCell = []
+        
         noInternetConnection()
     }
     
@@ -243,23 +245,39 @@ class AddSingleViewController: UIViewController, CoinDataDelegate, UITextFieldDe
             
             cellId = ""
             
-            singleCell = []
+            singleCell.removeAll()
             
-            let storedItems = UserDefaults.standard.object(forKey: coinSymbol + "buy") as? [Dictionary<String, String>]?
+            let storedItems = UserDefaults.standard.object(forKey: symbolInput.text! + "buy") as? [[String:String]]   //[Dictionary<String, String>]?
             
-            if let count = storedItems??.count {
+            //singleCell.updateValue(storedItems, forKey: symbolInput.text! + "buy")
+            
+            if (storedItems != nil) {
+                
+                for item in storedItems! {
+                    
+                    singleCell.append(item)
+                    
+                }
+                
+            } else {
+                
+            }
+            
+            /*if let count = storedItems??.count {
                 
                 for i in 0..<count {
                     
                     singleCell.append(storedItems!![i])
                 }
                 
-            }
+            }*/
             
             let populateCell: [String:String] = ["id": symbolInput.text!,"idCode": counterInput.text!,
                 "dataCell": "ID: \(counterInput.text!)\rDate: \(dateInput.text!)\rSymbol: \(symbolInput.text!)\rShares: \(sharesInput.text!)\rPrice: $\(priceInput.text!)\rGas/Fees: $\(feesInput.text!)\rCost Basis: $\(costInput.text!)","idCounter": counterInput.text!,"date": dateInput.text!,"symbol": symbolInput.text!,"shares": sharesInput.text!,"price": priceInput.text!,"gas": feesInput.text!,"costBasis": costInput.text!]
             
             cellId = counterInput.text!
+            
+            //singleCell.updateValue(populateCell, forKey: symbolInput.text! + "buy")
             
             singleCell.append(populateCell)
             
@@ -357,7 +375,7 @@ class AddSingleViewController: UIViewController, CoinDataDelegate, UITextFieldDe
             
             if (array2 == nil) {
                 
-                UserDefaults.standard.set([Double(sharesInput.text!)], forKey: symbolInput.text! + "totalAmount") 
+                UserDefaults.standard.set([Double(sharesInput.text!)], forKey: symbolInput.text! + "totalAmount")
                 
             } else {
                 
@@ -441,7 +459,6 @@ class AddSingleViewController: UIViewController, CoinDataDelegate, UITextFieldDe
                
                     
             }
-            
            
            let alert = UIAlertController(title: "Buy added!", message: "You have sucessfully added a buy.", preferredStyle: UIAlertController.Style.alert)
             
@@ -449,11 +466,11 @@ class AddSingleViewController: UIViewController, CoinDataDelegate, UITextFieldDe
                 
                 self.clearInputFields()
                 
-                let tableVC = CryptoTableViewController()
+                /*let tableVC = CryptoTableViewController()
                 tableVC.isModalInPresentation = true
                 
                 let navController = UINavigationController(rootViewController: tableVC)
-                self.present(navController, animated: true, completion: nil)
+                self.present(navController, animated: true, completion: nil)*/
                 
                 alert.dismiss(animated: true, completion: nil)
                 
@@ -476,6 +493,7 @@ class AddSingleViewController: UIViewController, CoinDataDelegate, UITextFieldDe
         feesInput.text = ""
         symbolInput.text = ""
         costInput.text = ""
+        
         
     }
     

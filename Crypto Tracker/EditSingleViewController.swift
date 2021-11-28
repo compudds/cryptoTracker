@@ -328,11 +328,11 @@ class EditSingleViewController: UIViewController, CoinDataDelegate, UITextFieldD
     
     func updateUserDefaults() {
         
-        editSingleCell = []
+        editSingleCell.removeAll()
         
-        editSingleCell2 = []
+        editSingleCell2.removeAll()
         
-       let storedItems = UserDefaults.standard.object(forKey: coinSymbol + "buy") as? [Dictionary<String, String>]?
+        let storedItems = UserDefaults.standard.object(forKey: coinSymbol + "buy") as? [Dictionary<String, String>]?
         
         if let count = storedItems??.count {
             
@@ -389,7 +389,9 @@ class EditSingleViewController: UIViewController, CoinDataDelegate, UITextFieldD
         
         UserDefaults.standard.set(editSingleCell, forKey: coinSymbol + "buy")
         
-        print("userDefaults updated!")
+        let storedItems2 = UserDefaults.standard.object(forKey: coinSymbol + "buy") as? [Dictionary<String, String>]?
+        
+        print("userDefaults updated!\rstoredItems2: \(String(describing: storedItems2))")
         
     }
     
@@ -409,26 +411,37 @@ class EditSingleViewController: UIViewController, CoinDataDelegate, UITextFieldD
             
         } else {
             
-            //addSingleBuy = []
+            singleCell.removeAll()
             
-            singleCell = []
+            coinSymbol = coinInput.text!
             
-            let storedItems = UserDefaults.standard.object(forKey: coinSymbol + counterInput.text!) as? [Dictionary<String, String>]?
+            /*let storedItems = UserDefaults.standard.object(forKey: coinSymbol + counterInput.text!) as? [[String:String]]  //[Dictionary<String, String>]?
             
-            if let count = storedItems??.count {
+            if (storedItems != nil) {
+                
+                for item in storedItems! {
+                    
+                    singleCell.append(item)
+                      
+                }
+                
+            } else {
+                
+            }*/
+            
+            /*if let count = storedItems.count {
                 
                 for i in 0..<count {
+                    
+                    singleCell.updateValue(storedItems, forKey: coinSymbol + counterInput.text!)
                     
                     singleCell.append(storedItems!![i])
                 }
                 
-            }
+            }*/
             
             let populateCell: [String:String] = ["id": coinInput.text!,"idCode": counterInput.text!,
                 "dataCell": "ID: \(counterInput.text!)\rDate: \(dateInput.text!)\rSymbol: \(coinInput.text!)\rShares: \(sharesInput.text!)\rPrice: $\(priceInput.text!)\rGas/Fees: $\(feesInput.text!)\rCost Basis: $\(costInput.text!)", "idCounter": counterInput.text!,"date": dateInput.text!,"symbol": coinInput.text!,"shares": sharesInput.text!,"price": priceInput.text!,"gas": feesInput.text!,"costBasis": costInput.text!]
-            
-            
-            coinSymbol = coinInput.text!
             
             singleCell.append(populateCell)
             
@@ -436,7 +449,7 @@ class EditSingleViewController: UIViewController, CoinDataDelegate, UITextFieldD
             
             updateUserDefaults()
             
-            updateTotals()
+            //updateTotals()
             
             print("Edit updated!")
             

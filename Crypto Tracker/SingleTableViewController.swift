@@ -47,12 +47,16 @@ class SingleTableViewController: UITableViewController, CoinDataDelegate {
     
     var amt = 0.00 //coin?.currentPrice
     
+    var percentLG = 0.0
+    
+    var cost2 = 0.0
+    
     var activityIndicator: UIActivityIndicatorView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        getSavedBuys()
+        //getSavedBuys()
         
         let backButton = UIBarButtonItem(title: "< Back", style: .plain, target: self, action: #selector(backTapped))
         
@@ -80,6 +84,12 @@ class SingleTableViewController: UITableViewController, CoinDataDelegate {
     }
     
     @objc func refresh(_ sender: AnyObject) {
+        
+        totalInvested = 0.0
+        totalInvested1 = 0.0
+        profitOrLoss = 0.0
+        profitOrLoss1 = 0.0
+        percentLG = 0.0
         
         self.tableView.reloadData()
         
@@ -148,23 +158,38 @@ class SingleTableViewController: UITableViewController, CoinDataDelegate {
     
     func getSavedBuys() {
         
-        let storedItems = UserDefaults.standard.object(forKey: coinSymbol + "buy") as? [Dictionary<String, String>]?
+        singleCell.removeAll()
         
-        singleCell = []
+        singleCellBuy.removeAll()
         
-        singleCellBuy = []
+        singleCellId.removeAll()
         
-        singleCellId = []
+        let storedItems = UserDefaults.standard.object(forKey: coinSymbol + "buy") as? [[String:String]]  //[Dictionary<String, String>]?
         
-        if let count = storedItems??.count {
+        if (storedItems != nil) {
             
-            for i in 0..<count {
+            for item in storedItems! {
                 
-                singleCell.append(storedItems!![i])
+                singleCell.append(item)
                 
             }
             
+        } else {
+            
         }
+        
+        
+        
+       
+        /*if let count = storedItems??.count {
+            
+            for i in 0..<count {
+                
+                singleCell.append((storedItems!![i]))
+                
+            }
+           
+        }*/
     
         print("singleCell: \(singleCell)")
         
@@ -174,27 +199,33 @@ class SingleTableViewController: UITableViewController, CoinDataDelegate {
         
         print("dataID: \(dataID)")
         
-        if dataID.isEmpty || dataID == [] {
+        if dataID.isEmpty {
             
             print("dataID is empty!")
             
         } else {
             
-            for item in dataID {
+            for item in singleCell {
                 
-                let buyIdCode = item["dataCell"]  //dataID["dataCell"]
-                
-                let buyIdCode2 = item["idCode"]
-                
-                let buySymbol = item["id"]
-                
-                if buySymbol == coinSymbol {
+                if item.isEmpty {
                     
-                    singleCellBuy.append(buyIdCode!)
+                } else {
+                
+                    let buyIdCode = item["dataCell"]
+                    
+                    let buyIdCode2 = item["idCode"]
+                    
+                    let buySymbol = item["id"]
+                    
+                    if buySymbol as! String == coinSymbol {
                         
-                    singleCellId.append(buyIdCode2!)
-                    
-                    print("singleCellBuy: \(singleCellBuy)")
+                        singleCellBuy.append(buyIdCode! as! String)
+                            
+                        singleCellId.append(buyIdCode2! as! String)
+                        
+                        print("singleCellBuy: \(singleCellBuy)")
+                        
+                    }
                     
                 }
                 
@@ -230,46 +261,6 @@ class SingleTableViewController: UITableViewController, CoinDataDelegate {
         
     }
     
-    func getCoinTotalShares() {
-        
-        let storedItems = UserDefaults.standard.object(forKey: coinSymbol + "totalAmount") as? [Any]?
-        
-        var totalCoinAmount = Double()
-        
-        if let count = storedItems??.count {
-            
-            for i in 0..<count {
-                
-                totalCoinAmount = storedItems!![i] as? Double ?? 0.0 + totalCoinAmount
-                
-            }
-            
-            print("totalCoinTotalShares: \(totalCoinAmount)")
-            
-            coin?.totalAmount = totalCoinAmount
-        }
-    }
-    
-    func getCoinAvgPrice() {
-        
-        let storedItems = UserDefaults.standard.object(forKey: coinSymbol + "totalPrice") as? [Any]?
-        
-        var totalCoinAvgPrice = Double()
-        
-        if let count = storedItems??.count {
-            
-            for i in 0..<count {
-                
-                totalCoinAvgPrice = (storedItems!![i] as? Double ?? 0.0 + totalCoinAvgPrice) // Double(count)
-                
-            }
-            
-            print("totalCoinAvgPrice: \(totalCoinAvgPrice)")
-            
-            coin?.totalPrice = totalCoinAvgPrice
-            
-        }
-    }
     
     func runCoinTotals() {
         
@@ -340,7 +331,7 @@ class SingleTableViewController: UITableViewController, CoinDataDelegate {
                     
                     coinAmount1 = 0.0
                     
-                    investAmt = []
+                    investAmt?.removeAll()
                     
                     items.removeAll()
                  
@@ -355,54 +346,15 @@ class SingleTableViewController: UITableViewController, CoinDataDelegate {
         }
        
     }
-    func getCoinAvgGas() {
-        
-        let storedItems = UserDefaults.standard.object(forKey: coinSymbol + "totalGas") as? [Any]?
-        
-        var totalCoinAvgGas = Double()
-        
-        if let count = storedItems??.count {
-            
-            for i in 0..<count {
-                
-                totalCoinAvgGas = (storedItems!![i] as? Double ?? 0.0 + totalCoinAvgGas) // Double(count)
-                
-            }
-            
-            print("totalCoinAvgGas: \(totalCoinAvgGas)")
-            
-            coin?.totalGas = totalCoinAvgGas
-            
-        }
-    }
     
-    func getCoinAvgCostBasis() {
-        
-        let storedItems = UserDefaults.standard.object(forKey: coinSymbol + "totalCostBasis") as? [Any]?
-        
-        var totalCoinAvgCostBasis = Double()
-        
-        if let count = storedItems??.count {
-            
-            for i in 0..<count {
-                
-                totalCoinAvgCostBasis = (storedItems!![i] as? Double ?? 0.0 + totalCoinAvgCostBasis) // Double(count)
-                
-            }
-            
-            print("totalCoinAvgCostBasis: \(totalCoinAvgCostBasis)")
-            
-            coin?.totalCostBasis = totalCoinAvgCostBasis
-            
-            totalInvested = totalCoinAvgCostBasis
-        }
-    }
-
     override func viewWillAppear(_ animated: Bool) {
         
         CoinData.shared.delegate = self
         
         amt = coin?.currentPrice ?? 0.0
+        
+        profitOrLoss = 0.0
+        totalInvested = 0.0
         
         getSavedBuys()
         
@@ -411,6 +363,12 @@ class SingleTableViewController: UITableViewController, CoinDataDelegate {
     }
     
     func newPrices() {
+        
+        totalInvested = 0.0
+        totalInvested1 = 0.0
+        profitOrLoss = 0.0
+        profitOrLoss1 = 0.0
+        percentLG = 0.0
         
         tableView.reloadData()
     }
@@ -449,57 +407,16 @@ class SingleTableViewController: UITableViewController, CoinDataDelegate {
         return headerView
     }
     
-    func getTotalInvested() {
-        
-        totalInvested = 0.00
-        
-        for symbol in cryptoSymbols {
-            
-            if symbol == coinSymbol {
-            
-                //var names = [Any]()
-                
-                let investAmt = UserDefaults.standard.object(forKey: symbol + "totalCostBasis1") as? [Any]
-                
-                if investAmt != nil {
-                    
-                    var strToDouble = String()
-                    
-                    for name in investAmt! {
-                       
-                        strToDouble = name as? String ?? "" + strToDouble
- 
-                    }
-                    
-                    totalInvested = Double(strToDouble)!
-                    
-                } else {
-                    
-                    print("names array is nil.")
-                }
-                   
-                
-                
-            }
-                
-        }
-        print("TotalInvested: \(totalInvested)")
-    }
-    
     func displayNetWorth() {
         
         runCoinTotals()
-        //getTotalInvested()
-        //getCoinAvgCostBasis()
-        //getCoinAvgGas()
-        //getCoinTotalShares()
-        //getCoinAvgPrice()
         
         amountLabel.text = "$" + CoinData.shared.coinNetWorthAsString()
-        profitOrLoss = coinNetWorth -  totalInvested
+        //profitOrLoss = totalInvested - coinNetWorth
         let polString = doubleToMoneyString(double: profitOrLoss)
-        let perPOL = doubleToString(double: (profitOrLoss / totalInvested) * 100)
-        profitOrLossAmtLabel.text = polString + " \(perPOL)%"
+        //let perPOL = doubleToString(double: (profitOrLoss / coin!.totalCostBasis) * 100)
+        let strPer = doubleToMoneyString(double: percentLG * 100)
+        profitOrLossAmtLabel.text = polString + " " + strPer + "%"  //polString + " \(perPOL)%"
         
         if profitOrLoss > 0.00 {
             
@@ -559,7 +476,7 @@ class SingleTableViewController: UITableViewController, CoinDataDelegate {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-        return 380
+        return 420
     }
     
     func getEditData() {
@@ -568,9 +485,9 @@ class SingleTableViewController: UITableViewController, CoinDataDelegate {
         
         let storedItems = UserDefaults.standard.object(forKey: coinSymbol + cellId) as? [Dictionary<String, String>]?
         
-        addSingleBuy = []
+        addSingleBuy.removeAll()
         
-        editSingleCellBuy = []
+        editSingleCellBuy.removeAll()
        
         if let count = storedItems??.count {
             
@@ -620,16 +537,17 @@ class SingleTableViewController: UITableViewController, CoinDataDelegate {
                     editPriceInput = item["price"]!
                     
                     editCostInput = item["costBasis"]!
+                   
                 }
-                
+              
             }
            
         }
-
+        
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-       
+        
         let cell = UITableViewCell()
         
         cell.textLabel!.numberOfLines = 15
@@ -638,9 +556,9 @@ class SingleTableViewController: UITableViewController, CoinDataDelegate {
         
         print("singleCellBuy: \(singleCellBuy)")
         
-        getEditData()
-        
         let coin1 = coins[indexPath.row]
+        
+        cost2 = 0
         
         coin1.gainLoss = 0.00
         
@@ -648,31 +566,49 @@ class SingleTableViewController: UITableViewController, CoinDataDelegate {
         
         cellId = singleCellId[indexPath.row]
         
-        if editSharesInput.isEmpty {
-            
+        let edit = singleCell[indexPath.row]
+        
+        if edit.isEmpty {
             
         } else {
             
-            let value = amt * Double(editSharesInput)!
+            let shares = Double(edit["shares"] as! String) ?? 0.0
             
-            let valueToDollar = String(format: "%.5f", value)
+            let cost = Double(edit["costBasis"] as! String) ?? 0.0
             
-            coin1.gainLoss = (value - Double(editCostInput)!) - Double(editFeesInput)!
-            
-            let gainLossStr = String(format: "%.2f", coin1.gainLoss)
-            
-            coin1.percentGainLoss = (coin1.gainLoss / Double(editCostInput)!) * 100
-            
-            let doubleStr = String(format: "%.2f", coin1.percentGainLoss)
+            if shares.isNaN {
                 
-            cell.textLabel?.text = "\(singleCellBuy[indexPath.row])\rCurrent Price: $\(amt)\rValue: $\(valueToDollar)\rGain/Loss: $\(gainLossStr)\rGain/Loss %: \(doubleStr)%"
-            
-            cell.imageView?.image = coin?.image
-            
-            print("cellId: \(cellId)")
                 
+            } else {
+                
+                let value = amt * shares
+                
+                let valueToDollar = String(format: "%.7f", value)
+                
+                coin1.gainLoss = (value - cost)
+                
+                let gainLossStr = String(format: "%.2f", coin1.gainLoss)
+                
+                coin1.percentGainLoss = (coin1.gainLoss / cost) * 100
+               
+                let doubleStr = String(format: "%.2f", coin1.percentGainLoss)
+                    
+                cell.textLabel?.text = "\(singleCellBuy[indexPath.row])\rCurrent Price: $\(amt)\rValue: $\(valueToDollar)\rGain/Loss: $\(gainLossStr)\rGain/Loss %: \(doubleStr)%"
+                
+                cell.imageView?.image = coin?.image
+                
+                profitOrLoss = coin1.gainLoss + profitOrLoss
+                
+                cost2 = cost + cost2
+                
+                percentLG = profitOrLoss / cost2
+                
+                print("cellId: \(cellId)")
+                    
+            }
+            
         }
-        
+            
        return cell
     }
     

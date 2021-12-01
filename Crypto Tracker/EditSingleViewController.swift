@@ -251,78 +251,91 @@ class EditSingleViewController: UIViewController, CoinDataDelegate, UITextFieldD
     
     func updateTotals() {
         
-        let array = UserDefaults.standard.object(forKey: coinSymbol + "totalPrice")
+        let totals = ["totalPrice","totalAmount","totalGas","totalCostBasis","totalInvestmentAmt"]
         
-        UserDefaults.standard.removeObject(forKey: coinSymbol + "totalPrice")
+        var edit = String()
         
-        var newArray = [Any]()
+        var price = String()
         
-        newArray.append(array!)
-        
-        let totalPrice = Double(priceInput.text!)
-        
-        newArray.append(totalPrice!)
-        
-        UserDefaults.standard.set(newArray, forKey: coinSymbol + "totalPrice")
-        
-        
-        let array1 = UserDefaults.standard.object(forKey: coinSymbol + "totalCostBasis")
-        
-        UserDefaults.standard.removeObject(forKey: coinSymbol + "totalCostBasis")
-        
-        var newArray1 = [Any]()
-        
-        newArray1.append(array1!)
-        
-        let totalCostBasis = Double(costInput.text!)
-        
-        newArray1.append(totalCostBasis!)
-        
-        UserDefaults.standard.set(newArray1, forKey: coinSymbol + "totalCostBasis")
-        
-        
-        let array2 = UserDefaults.standard.object(forKey: coinSymbol + "totalAmount")
-        
-        UserDefaults.standard.removeObject(forKey: coinSymbol + "totalAmount")
-        
-        var newArray2 = [Any]()
-        
-        newArray2.append(array2!)
-        
-        let totalShares = Double(sharesInput.text!)
-        
-        newArray2.append(totalShares!)
-         
-        UserDefaults.standard.set(newArray2, forKey: coinSymbol + "totalAmount")
-        
-        
-        let array3 = UserDefaults.standard.object(forKey: coinSymbol + "totalGas")
-        
-        UserDefaults.standard.removeObject(forKey: coinSymbol + "totalGas")
-        var newArray3 = [Any]()
-        
-        newArray3.append(array3!)
-        
-        let totalGas = Double(feesInput.text!)
-        
-        newArray3.append(totalGas!)
-        
-        UserDefaults.standard.set(newArray3, forKey: coinSymbol + "totalGas")
-        
-        
-        let array4 = UserDefaults.standard.object(forKey: coinSymbol + "totalInvestmentAmt")
-        
-        UserDefaults.standard.removeObject(forKey: coinSymbol + "totalInvestmentAmt")
-        
-        var newArray4 = [Any]()
-        
-        newArray4.append(array4!)
-        
-        let totalInvAmt = Double(costInput.text!)
-        
-        newArray4.append(totalInvAmt!)
-        
-        UserDefaults.standard.set(newArray4,forKey: coinSymbol + "totalInvestmentAmt")
+        for item in totals {
+            
+            if item == "totalPrice" {
+                
+                edit = editPriceInput
+                
+                price = priceInput.text!
+            }
+            
+            if item == "totalGas" {
+                
+                edit = editFeesInput
+                
+                price = feesInput.text!
+            }
+            
+            if item == "totalAmount" {
+                
+                edit = editSharesInput
+                
+                price = sharesInput.text!
+            }
+            
+            if item == "totalCostBasis" {
+                
+                edit = editCostInput
+                
+                price = costInput.text!
+            }
+            
+            if item == "totalInvestmentAmt" {
+                
+                edit = editCostInput
+                
+                price = costInput.text!
+            }
+            
+            let array = UserDefaults.standard.object(forKey: coinSymbol + item) as? [Double]?
+            
+            print(array as Any)
+            
+            print(edit)
+            
+            if let count = array??.count {
+                
+                var count1 = 0
+                
+                var newArray = [Double]()
+                
+                for i in 0..<count {
+                    
+                    print("array for " + item + ": \(array!![i])")
+                    
+                    if array!![i] == Double(edit) && count1 < 1 {
+                        
+                       let totalPrice = Double(price)
+                        
+                        newArray.append(totalPrice!)
+                        
+                        count1 = count1 + 1
+                        
+                    } else {
+                        
+                        newArray.append(array!![i])
+                        
+                    }
+                    
+                }
+                
+                print("newArray for " + item + ": \(newArray)")
+                
+                UserDefaults.standard.set(newArray, forKey: coinSymbol + item)
+                
+                let updatedArray = UserDefaults.standard.object(forKey: coinSymbol + item)
+                
+                print("updatedArray" + item + " \(String(describing: updatedArray))\r\r")
+            }
+            
+        }
        
     }
     
@@ -449,7 +462,7 @@ class EditSingleViewController: UIViewController, CoinDataDelegate, UITextFieldD
             
             updateUserDefaults()
             
-            //updateTotals()
+            updateTotals()
             
             print("Edit updated!")
             

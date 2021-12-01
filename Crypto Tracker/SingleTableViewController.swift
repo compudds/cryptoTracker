@@ -415,7 +415,7 @@ class SingleTableViewController: UITableViewController, CoinDataDelegate {
         //profitOrLoss = totalInvested - coinNetWorth
         let polString = doubleToMoneyString(double: profitOrLoss)
         //let perPOL = doubleToString(double: (profitOrLoss / coin!.totalCostBasis) * 100)
-        let strPer = doubleToMoneyString(double: percentLG * 100)
+        let strPer = doubleToString(double: percentLG * 100)
         profitOrLossAmtLabel.text = polString + " " + strPer + "%"  //polString + " \(perPOL)%"
         
         if profitOrLoss > 0.00 {
@@ -647,28 +647,137 @@ class SingleTableViewController: UITableViewController, CoinDataDelegate {
         UserDefaults.standard.set(cryptoSymbols, forKey: "symbols")
     }
     
+    func updateTotals() {
+        
+        let totals = ["totalPrice","totalAmount","totalGas","totalCostBasis","totalInvestmentAmt"]
+        
+        var delete = String()
+        
+        for sym in cryptoSymbols{
+            
+            for item in totals {
+                
+                
+                if item == "totalPrice" {
+                    
+                    delete = editPriceInput
+                    
+                }
+                
+                if item == "totalGas" {
+                    
+                    delete = editFeesInput
+                    
+                }
+                
+                if item == "totalAmount" {
+                    
+                    delete = editSharesInput
+                    
+                }
+                
+                if item == "totalCostBasis" {
+                    
+                    delete = editCostInput
+                   
+                }
+                
+                if item == "totalInvestmentAmt" {
+                    
+                    delete = editCostInput
+                    
+                }
+                 
+                if sym == coinSymbol {
+                    
+                    print("coinSymbol: \(coinSymbol)")
+                    
+                    let array = UserDefaults.standard.object(forKey: coinSymbol + item) as? [Double]?
+                    
+                    print("array: \(array as Any)")
+                    
+                    print("delete: \(delete)")
+                    
+                    if let count = array??.count {
+                        
+                        var count1 = 0
+                        
+                        var newArray1 = [Double]()
+                        
+                        for i in 0..<count {
+                            
+                            print("array for " + item + ": \(array!![i])")
+                            
+                            if array!![i] == Double(delete) && count1 < 1 {
+                                
+                                count1 = count1 + 1
+                                
+                            } else {
+                                
+                                let double = Double(array!![i])
+                                
+                                newArray1.append(double)
+                                
+                            }
+                            
+                        }
+                        
+                        print("newArray for " + item + ": \(newArray1)\r\r")
+                      
+                        UserDefaults.standard.set(newArray1, forKey: coinSymbol + item)
+                        
+                        let updatedArray = UserDefaults.standard.object(forKey: coinSymbol + item)
+                        
+                        print("updatedArray" + item + " \(String(describing: updatedArray))\r\r")
+                    
+                }
+                
+            }
+                
+        }
+            
+    }
+       
+    }
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
         if editingStyle == .delete {
             
-            UserDefaults.standard.removeObject(forKey: coinSymbol + cellId)
+            let alert = UIAlertController(title: "Are you sure you want to delete this item?", message: "Please pick one.", preferredStyle: UIAlertController.Style.alert)
             
-            singleCellBuy.remove(at: indexPath.row)
+            alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { [self] action in
+                
+                alert.dismiss(animated: true, completion: nil)
+                
+                getEditData()
+                
+                updateTotals()
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + cellId)
+                
+                singleCellBuy.remove(at: indexPath.row)
+                
+                singleCellId.remove(at: indexPath.row)
+                
+                singleCell.remove(at: indexPath.row)
+                
+                UserDefaults.standard.set(singleCell, forKey: coinSymbol + "buy")
+                
+                print("Item deleted!")
+                
+                tableView.deleteRows(at: [indexPath], with: .fade)
+                
+                tableView.reloadData()
+                
+            }))
             
-            singleCellId.remove(at: indexPath.row)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+                
+                alert.dismiss(animated: true, completion: nil)
+                
+            }))
             
-            //addSingleBuy.remove(at: indexPath.row)
-            
-            singleCell.remove(at: indexPath.row)
-            
-            
-            //UserDefaults.standard.removeObject(forKey: coinSymbol + "cell")
-            
-            print("Item deleted!")
-            
-            tableView.deleteRows(at: [indexPath], with: .fade)
-            
-            tableView.reloadData()
+            self.present(alert, animated: true, completion: nil)
         
         }
     }

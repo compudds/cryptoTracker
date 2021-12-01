@@ -80,7 +80,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         self.refreshControl = refreshControl
         
-        runCoinTotals()
+        updatePrices()
         
     }
     
@@ -157,6 +157,8 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             print("Timer Started!!!")
             
             runCoinTotals()
+            
+            tableView.reloadData()
             
             timer = Timer.scheduledTimer(timeInterval: 75, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
             
@@ -397,14 +399,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     }
     
     @objc func updatePrices() {
-        
-        /*totalInvested = 0.0
-        totalInvested1 = 0.0
-        profitOrLoss = 0.0
-        profitOrLoss1 = 0.0
-        percentLG = 0.0
-        cost1 = 0.0*/
-        
+       
         CoinData.shared.getPrices()
         
         CoinData.shared.getYesterdaysClose()
@@ -707,8 +702,6 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         let value = coin.currentPrice * shares
         
-        //let value = coin.currentPrice * coin.totalAmount
-        
         let valueToDollar = String(format: "%.7f", value)
         
         totalInvested1 = Double(valueToDollar)! + totalInvested1
@@ -883,18 +876,76 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         if editingStyle == .delete {
             
-            cryptoSymbols.remove(at: indexPath.row)
+            let alert = UIAlertController(title: "Are you sure you want to delete this item?", message: "Please pick one.", preferredStyle: UIAlertController.Style.alert)
             
-            coins.remove(at: indexPath.row)
+            alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { [self] action in
+                
+                alert.dismiss(animated: true, completion: nil)
+                
+                let coinVC = SingleTableViewController()
+                coinVC.coin = coins[indexPath.row]
+                cellId = coinVC.coin!.id
+                coinSymbol = coinVC.coin!.symbol
+                
+                cryptoSymbols.remove(at: indexPath.row)
+                
+                coins.remove(at: indexPath.row)
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "buy")
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + cellId)
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "id")
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "price")
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "amount")
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "costBasis")
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "investmentAmt")
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "gas")
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "totalPrice")
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "totalAmount")
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "totalGas")
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "totalCostBasis")
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "totalInvestmentAmt")
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "totalPrice1")
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "totalAmount1")
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "totalGas1")
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "totalCostBasis1")
+                
+                UserDefaults.standard.removeObject(forKey: coinSymbol + "totalInvestmentAmt1")
+                
+                print("Item deleted!")
+                
+                tableView.deleteRows(at: [indexPath], with: .fade)
+                
+                tableView.reloadData()
+                
+                timer = Timer.scheduledTimer(timeInterval: 75, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
             
-            print("Item deleted!")
+                
+            }))
             
-            tableView.deleteRows(at: [indexPath], with: .fade)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+                
+                alert.dismiss(animated: true, completion: nil)
+                
+            }))
             
-            tableView.reloadData()
-            
-            timer = Timer.scheduledTimer(timeInterval: 75, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
-        
+            self.present(alert, animated: true, completion: nil)
+                
         }
         
     }

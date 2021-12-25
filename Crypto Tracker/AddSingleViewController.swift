@@ -272,6 +272,55 @@ class AddSingleViewController: UIViewController, CoinDataDelegate, UITextFieldDe
                 
             }*/
             
+            let noWhiteSpaces = symbolInput.text!.replacingOccurrences(of: " ", with: "")
+            
+            symbolInput.text = noWhiteSpaces
+            
+            let myStringArray = [sharesInput.text!,priceInput.text!,feesInput.text!,costInput.text!]
+            
+            for string in myStringArray {
+                
+                if string.contains("$") || string.contains(",") {
+                    
+                    let myNumbers = string.filter {"0123456789.".contains($0) }
+                    
+                    if string == sharesInput.text! {
+                        
+                        sharesInput.text! = myNumbers
+                    }
+                    
+                    if string == priceInput.text! {
+                        
+                        priceInput.text! = myNumbers
+                    }
+                    
+                    if string == feesInput.text! {
+                        
+                        feesInput.text! = myNumbers
+                    }
+                    
+                    if string == costInput.text! {
+                        
+                        costInput.text! = myNumbers
+                    }
+                    
+                    let alert = UIAlertController(title: "Excepted Charactors", message: "We have eleiminated whitespaces, dollar signs and commas from input fields and added your buy.", preferredStyle: UIAlertController.Style.alert)
+                     
+                     alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: { action in
+                         
+                         alert.dismiss(animated: true, completion: nil)
+                         
+                         
+                     }))
+                    
+                     self.present(alert, animated: true, completion: nil)
+                    
+                } else {
+                    
+                }
+                
+            }
+       
             let populateCell: [String:String] = ["id": symbolInput.text!,"idCode": counterInput.text!,
                 "dataCell": "ID: \(counterInput.text!)\rDate: \(dateInput.text!)\rSymbol: \(symbolInput.text!)\rShares: \(sharesInput.text!)\rPrice: $\(priceInput.text!)\rGas/Fees: $\(feesInput.text!)\rCost Basis: $\(costInput.text!)","idCounter": counterInput.text!,"date": dateInput.text!,"symbol": symbolInput.text!,"shares": sharesInput.text!,"price": priceInput.text!,"gas": feesInput.text!,"costBasis": costInput.text!]
             

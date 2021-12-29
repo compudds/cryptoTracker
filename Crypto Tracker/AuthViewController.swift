@@ -71,7 +71,7 @@ class AuthViewController: UIViewController {
                     
                     DispatchQueue.main.async {
                         
-                        self.createSpinnerView()
+                        //self.createSpinnerView()
                         
                         let cryptoTableVC = CryptoTableViewController()
                         cryptoTableVC.isModalInPresentation = true

@@ -164,9 +164,9 @@ class CoinData {
                     
                     if let url = URL(string: "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=\(symbol)&tsyms=USD") {
                         
-                        let data = try? Data(contentsOf: url)
+                        let data = try Data(contentsOf: url)
                         
-                        let json = try? JSONSerialization.jsonObject(with: data!, options: [])
+                        let json = try JSONSerialization.jsonObject(with: data, options: [])
                         
                         if let object = json as? [String: Any] {
                             

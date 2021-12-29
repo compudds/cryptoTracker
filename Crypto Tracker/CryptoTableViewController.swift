@@ -64,7 +64,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         let addButton = UIBarButtonItem(title: "Add", style: .plain, target: self, action: #selector(addButtonTapped))
         
-        let refreshButton = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(updatePrices))
+        let refreshButton = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(createSpinnerView))
         
         navigationController?.navigationBar.backgroundColor = .white
         
@@ -80,7 +80,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         self.refreshControl = refreshControl
         
-        updatePrices()
+        createSpinnerView()
         
     }
     
@@ -94,7 +94,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     
     @objc func refresh(_ sender: AnyObject) {
         
-        updatePrices()
+        createSpinnerView()
         
         refreshControl!.endRefreshing()
        
@@ -160,7 +160,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
             
             tableView.reloadData()
             
-            timer = Timer.scheduledTimer(timeInterval: 75, target: self, selector: #selector(updatePrices), userInfo: nil, repeats: true)
+            timer = Timer.scheduledTimer(timeInterval: 75, target: self, selector: #selector(createSpinnerView), userInfo: nil, repeats: true)
             
             print("Prices updated.")
             
@@ -193,25 +193,6 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         print("Timer Stoped!!!")
         
         timer.invalidate()
-    }
-    
-    func createSpinnerView() {
-        let child = SpinnerViewController()
-        
-        // add the spinner view controller
-        addChild(child)
-        child.view.frame = view.frame
-        view.addSubview(child.view)
-        child.didMove(toParent: self)
-        
-        // wait five seconds to simulate some work happening
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            // then remove the spinner view controller
-            child.willMove(toParent: nil)
-            child.view.removeFromSuperview()
-            child.removeFromParent()
-            child.spinner.stopAnimating()
-        }
     }
     
     func getSavedCryptoSymbols() {
@@ -399,7 +380,7 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
     }
     
     @objc func updatePrices() {
-       
+        
         CoinData.shared.getPrices()
         
         CoinData.shared.getYesterdaysClose()
@@ -416,6 +397,8 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         
         DispatchQueue.main.async {
             
+            //self.createSpinnerView()
+            
             self.runCoinTotals()
             
             self.displayNetWorth()
@@ -425,8 +408,27 @@ class CryptoTableViewController: UITableViewController, CoinDataDelegate {
         }
        
     }
-
     
+    @objc func createSpinnerView() {
+        let child = SpinnerViewController()
+        
+        // add the spinner view controller
+        addChild(child)
+        child.view.frame = view.frame
+        view.addSubview(child.view)
+        child.didMove(toParent: self)
+        
+        // wait five seconds to simulate some work happening
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            // then remove the spinner view controller
+            self.updatePrices()
+            child.willMove(toParent: nil)
+            child.view.removeFromSuperview()
+            child.removeFromParent()
+            child.spinner.stopAnimating()
+        }
+    }
+   
     @objc func reportTapped() {
         endTimer()
         let formatter = UIMarkupTextPrintFormatter(markupText: CoinData.shared.html())
